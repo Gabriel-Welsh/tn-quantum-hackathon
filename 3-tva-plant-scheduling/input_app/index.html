@@ -1,28 +1,54 @@
 <!doctype html>
+<!--
+  Main app shell, served by server.py at /. All three views live in this file;
+  navigation.js shows one section based on the URL fragment (#plants, #demand,
+  or #schedule). Keep section IDs, control IDs, and data-page-link values in sync
+  with the JavaScript files that query them. CSS lives in styles.css.
+-->
 <html lang="en">
 <head>
+  <!-- The viewport tag keeps forms, tables, and charts usable in the narrow Canvas pane. -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Plant scheduling editor</title>
+  <!-- Relative asset URLs work both at / and through qBraid's /proxy/8000/ path. -->
   <link rel="stylesheet" href="styles.css">
-  <!-- Navigation reads the #plants/#demand fragment; keep these IDs in sync with navigation.js. -->
+  <!-- Navigation reads the page fragment and toggles the hidden state of each section. -->
   <script src="navigation.js" defer></script>
-  <!-- Modules isolate each page script: both use local names such as form and status. -->
+  <!--
+    Each view owns a module. Modules wait for HTML parsing and have separate
+    variable scopes, so common names such as status do not collide. When adding
+    a view, add its script here and serve that file from server.py's GET map.
+  -->
   <script type="module" src="app.js"></script>
   <script type="module" src="plants.js"></script>
+  <script type="module" src="schedule.js"></script>
 </head>
 <body>
-  <!-- These links change the URL fragment, so Canvas keeps one preview frame open. -->
+  <!--
+    These links change only the fragment, keeping unsaved form edits in the
+    current page. Add a matching data-page-link and section ID for a new tab,
+    then update showPage() in navigation.js.
+  -->
   <nav aria-label="Pages">
     <a href="#plants" data-page-link="plants">Power plants</a>
     <a href="#demand" data-page-link="demand">Demand and reserve</a>
+    <a href="#schedule" data-page-link="schedule">Plant schedule</a>
   </nav>
 
-  <!-- The plant editor is filled by plants.js. Its IDs are queried there. -->
+  <!--
+    Plant editor. plants.js fetches saved rows from /api/plants and creates the
+    cards inside #plant-cards. The section starts hidden; navigation.js selects
+    which page is visible. Only the Save button writes input_app/plants.csv.
+  -->
   <section id="plants-page" hidden>
     <h1>Power plants</h1>
     <p>Choose how to build your plant list. Review the rows below, then save them to plants.csv.</p>
-    <!-- Both choices replace the rows shown below; only Save writes plants.csv. -->
+    <!--
+      Both choices replace the cards in the form. The default button uses the
+      ten-plant snapshot in plants.js, independent of previously saved edits.
+      Import reads a local CSV in the browser; neither action saves by itself.
+    -->
     <div class="plant-options">
       <div class="plant-option">
         <h2>Manually edit 10 default plants</h2>
@@ -32,7 +58,11 @@
       <div class="plant-option">
         <h2>Add your own plants via CSV</h2>
         <p>Import a plants CSV to add your own list of power plants (Make sure it's in the same format as the default).</p>
-        <!-- Keep the input inside the label: clicking anywhere in the drop zone opens the picker. -->
+        <!--
+          Keep the file input inside this label so clicking the whole drop area
+          opens the picker. plants.js also attaches drag/drop handlers to the
+          label ID and validates the CSV against its FIELDS list.
+        -->
         <label class="csv-drop-zone" id="plant-csv-drop-zone">
           <input type="file" id="plant-csv-file" accept=".csv,text/csv">
           <span>Drop a .csv file here, or</span>
@@ -40,7 +70,11 @@
         </label>
       </div>
     </div>
-    <!-- plants.js builds one card per CSV row inside plant-cards. -->
+    <!--
+      On submit, plants.js gathers each card's data-field inputs and POSTs to
+      /api/plants. The server validates before replacing plants.csv. The status
+      paragraph reports import and save errors via its live region.
+    -->
     <form id="plants-form">
       <div class="actions">
         <button type="submit">Save plants.csv</button>
@@ -51,21 +85,33 @@
     </form>
   </section>
 
-  <!-- The demand editor and SVG chart are filled by app.js. -->
+  <!--
+    Demand editor. app.js fetches saved hours from /api/demand, fills #hours,
+    and draws #demand-chart. Saving POSTs all hourly values to /api/demand.
+    Editing here does not recalculate a schedule until Generate is used below.
+  -->
   <section id="demand-page">
     <h1>Demand and reserve</h1>
     <p>The solid line shows demand. The dotted line shows demand plus reserve: the capacity needed each hour. Edit demand below; use the reserve slider to set every hour at once.</p>
-    <!-- Reserve is a percentage of each hour's demand; app.js rounds to whole MW. -->
+    <!--
+      This one slider sets reserve for every hour as a percentage of demand;
+      app.js rounds each resulting MW value to a whole number. Keep the label,
+      output, and input IDs aligned with its selectors.
+    -->
     <div class="reserve-control">
       <label for="reserve-percent">Reserve for every hour: <output id="reserve-percent-value" for="reserve-percent">10%</output></label>
       <input type="range" id="reserve-percent" min="0" max="100" step="1" value="10">
       <span>0%</span><span>100%</span>
     </div>
-    <!-- Chart coordinates and series are defined in app.js; colors live in styles.css. -->
+    <!--
+      The SVG starts empty. app.js creates the demand and demand-plus-reserve
+      lines using this viewBox; styles.css supplies their colors and legend.
+    -->
     <div class="chart-frame">
       <svg id="demand-chart" viewBox="0 0 760 300" role="img" aria-label="Hourly demand and demand plus reserve chart"></svg>
       <div class="legend"><span>Demand</span><span class="reserve">Demand + reserve</span></div>
     </div>
+    <!-- The table body is generated from saved demand.csv rows by app.js. -->
     <form id="demand-form">
       <div class="actions">
         <button type="submit">Save demand.csv</button>
@@ -80,6 +126,57 @@
         </table>
       </div>
     </form>
+  </section>
+
+  <!--
+    Schedule view. schedule.js discovers local Python algorithms via
+    /api/algorithms, then requests /api/schedule for the selected algorithm.
+    The server uses saved CSVs, so users must save edits on the other tabs first.
+  -->
+  <section id="schedule-page" hidden>
+    <h1>Plant schedule</h1>
+    <p>See which saved plants should be on for each hour of the saved demand day. Save changes on the other tabs, then generate the schedule again.</p>
+    <!-- schedule.js fills the selector; new algorithms are discovered in algorithms/. -->
+    <div class="schedule-controls">
+      <label for="schedule-algorithm">Algorithm</label>
+      <select id="schedule-algorithm"></select>
+      <button type="button" id="run-schedule">Generate schedule</button>
+    </div>
+    <!-- Description, progress/errors, validity, cost, and violations are filled by schedule.js. -->
+    <p id="schedule-description"></p>
+    <p id="schedule-status" role="status" aria-live="polite"></p>
+    <div id="schedule-summary"></div>
+    <!--
+      Stacked capacity chart. schedule.js creates SVG bars from each online
+      plant's pmax_mw and overlays demand plus reserve. These are available MW,
+      not dispatched generation. Change the viewBox with showChart() in
+      schedule.js if changing its coordinate system; legend colors come from JS.
+    -->
+    <div id="schedule-chart-panel" class="schedule-chart-panel" hidden>
+      <h2>Online capacity by hour</h2>
+      <p>Each colored layer is one plant's maximum available capacity while it is on. The line is demand plus reserve.</p>
+      <div class="schedule-chart-wrap">
+        <svg id="schedule-chart" viewBox="0 0 960 370" role="img" aria-label="Stacked online plant capacity by hour, with demand plus reserve line"></svg>
+      </div>
+      <div id="schedule-chart-legend" class="schedule-chart-legend" aria-label="Chart legend"></div>
+    </div>
+    <!-- schedule.js also writes one readable row per hour into #schedule-rows. -->
+    <div class="table-wrap">
+      <table id="schedule-table" hidden>
+        <thead><tr><th>Hour starting</th><th>Demand (MW)</th><th>Reserve (MW)</th><th>Plants on</th><th>Online capacity (MW)</th></tr></thead>
+        <tbody id="schedule-rows"></tbody>
+      </table>
+    </div>
+    <!--
+      Editable pitch draft. The text below is its initial value; schedule.js
+      saves user edits in this browser's localStorage under its caseStorageKey.
+      Changing this default does not overwrite a browser's previously saved text.
+    -->
+    <section class="quantum-case">
+      <h2>Quantum computing outlook</h2>
+      <label for="quantum-case">Editable case draft</label>
+      <textarea id="quantum-case" rows="6">Current quantum computers are not yet reliable or large enough to outperform strong classical methods on realistic day-ahead plant scheduling. If hardware and algorithm trends continue, useful hybrid quantum methods could emerge in roughly 6–7 years. This is a scenario to test, not a forecast: we would compare solution quality, runtime, and cost with the classical baseline as the technology improves.</textarea>
+    </section>
   </section>
 </body>
 </html>

@@ -1,3 +1,7 @@
+// Jupyter checkpoint of an older navigation.js, not served by server.py.
+// This snapshot switches only the Power plants and Demand tabs. The live app
+// also has a Plant schedule tab, so edit ../navigation.js and ../index.html
+// together when changing page routes. Jupyter may overwrite this checkpoint.
 // Switch views with a URL fragment. qBraid Canvas keeps the same preview frame,
 // so clicking a tab does not request a new top-level page from Lab.
 // Unknown or empty fragments open Demand and reserve; change this fallback to choose a new landing page.

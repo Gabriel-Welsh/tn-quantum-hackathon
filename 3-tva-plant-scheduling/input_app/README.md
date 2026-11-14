@@ -20,13 +20,56 @@
 
 In Agent Canvas, use the tabs at the top to switch views.
 
-The app has two pages:
+The app has three pages:
 
 - **Power plants**: choose **Use 10 default plants** to edit the starter fleet, or drop a CSV onto the upload area (or click **Add power plant .csv**) to import your own fleet. Review the rows, then click **Save plants.csv** to write `input_app/plants.csv`. Importing alone does not save. The CSV must have the same columns as `input_app/plants.csv`.
 - **Demand and reserve**: edit demand for each hour. Use the single reserve
   percentage slider above the chart to set reserve for every hour at once
   (rounded to whole MW). The solid line is demand; the dotted line is demand
   **plus** reserve. Click **Save demand.csv** to write `input_app/demand.csv`.
+- **Plant schedule**: see which plants should be on for each saved hour. The
+  classical baseline runs when the page loads; choose an algorithm and click
+  **Generate schedule** to recalculate after changing either CSV. The page
+  shows a stacked hourly capacity chart, with one color per online plant and
+  a line for demand plus reserve. The bars show available capacity, not actual
+  generation. The page also shows rule violations if an algorithm returns an
+  invalid schedule. The quantum outlook text box is an editable draft kept in this browser's local
+  storage.
+
+## Add a scheduling algorithm
+
+Add a Python file to `input_app/algorithms/`. It appears in the algorithm
+selector after a page refresh. Each file exports `NAME`, optionally
+`DESCRIPTION`, and `solve(plants, demand, reserve)`. The arguments are the
+saved plants as a list of dictionaries and demand/reserve as NumPy arrays.
+Return a matrix with one row per hour and one column per plant, in the same
+order as the inputs; use `1` for on and `0` for off.
+
+For example, `input_app/algorithms/quantum_trial.py` can call a function in
+another Python file:
+
+```python
+from algorithms._quantum_solver import schedule_day
+
+NAME = "Quantum trial"
+DESCRIPTION = "Experimental commitment schedule"
+
+def solve(plants, demand, reserve):
+    return schedule_day(plants, demand, reserve)
+```
+
+Put helper code in `algorithms/_quantum_solver.py`: files starting with `_`
+are not listed as algorithms. The server discovers new algorithm files
+automatically; restart it after editing an already loaded module. The app
+checks the returned shape and on/off values, then uses `check.py` to report
+demand, reserve, minimum on/off time, and ramp violations. The included
+`classical_baseline.py` calls the project's SciPy mixed-integer solver, so the
+server environment needs NumPy and SciPy for that algorithm. The included
+`cheapest_first.py` follows the notebook's written cheapest-first rule: rank
+plants by marginal cost plus no-load cost divided by maximum MW, then add
+plants until capacity covers demand plus reserve. It is a comparison rule and
+may break minimum on/off time or other constraints; the schedule page reports
+those violations.
 
 The source examples in `data/` stay unchanged. To use the edited files in a
 notebook or Python script run from this project folder:
@@ -44,8 +87,8 @@ with Ctrl+C.
 ## For future maintainers
 
 - `index.html` is the maintained page. `plants.html` redirects old bookmarks to its Power plants tab. The scripts in `index.html` are modules so page-local variables do not collide.
-- `navigation.js` switches the two sections by URL fragment. `app.js` builds the demand table and SVG chart. `plants.js` builds plant cards, parses uploaded CSVs, and contains the 10 default plants.
-- `server.py` serves known files and the two JSON APIs. Its POST handlers validate all rows before replacing a CSV. The CSV files are data: do not add comments or change headers casually.
+- `navigation.js` switches the three sections by URL fragment. `app.js` builds the demand table and SVG chart. `plants.js` builds plant cards, parses uploaded CSVs, and contains the 10 default plants. `schedule.js` renders algorithm results.
+- `server.py` serves known files and the plant, demand, algorithm, and schedule APIs. Its POST handlers validate all rows before replacing a CSV. The CSV files are data: do not add comments or change headers casually.
 - To change plant fields, update `plants.csv`, the `FIELDS` list and import validation in `plants.js`, and `PLANT_NUMBERS` / `save_plants` in `server.py`. Update the 10-plant snapshot in `plants.js` if `data/plants10.csv` changes.
 - To change hourly demand fields, update `demand.csv`, the table and `getRows()` in `app.js`, and `save_demand()` in `server.py`. The reserve percentage is calculated in `reserveFor()` and applied by the slider listener. Update the chart and legend if the new field should be plotted.
 - To change a page section or its IDs, check selectors in the matching script and styles in `styles.css`. To add a served asset, add it to the GET file map in `server.py`.

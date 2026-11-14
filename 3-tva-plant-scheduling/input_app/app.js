@@ -1,5 +1,8 @@
-// Demand editor: index.html owns the markup, server.py owns CSV reads and writes.
-// Keep these selectors in sync with the IDs in index.html.
+// Demand and reserve editor for the #demand section of index.html.
+// Startup: GET saved demand.csv via /api/demand, build one input row per hour,
+// and draw the chart. Edits stay in the browser until the form POSTs every hour
+// to /api/demand; server.py validates and writes the CSV. Keep these selectors
+// in sync with index.html when changing the page.
 const form = document.querySelector("#demand-form");
 const hoursBody = document.querySelector("#hours");
 const chart = document.querySelector("#demand-chart");
@@ -22,7 +25,8 @@ function reserveFor(demand) {
   return Math.round(demand * Number(reserveSlider.value) / 100);
 }
 
-// Read editable demand and calculate reserve. null marks an invalid row for chart and Save.
+// Read the current form rather than storing a second copy of demand state.
+// Reserve is derived from the slider; null marks an invalid row for chart and Save.
 function getRows() {
   return [...hoursBody.querySelectorAll("tr")].map((tr) => {
     const demandInput = tr.querySelector('[data-field="demand_mw"]');
@@ -32,7 +36,8 @@ function getRows() {
   });
 }
 
-// Rebuild the chart from the current table; no chart library or separate state is used.
+// Rebuild the chart from current form values; no chart library or separate
+// state is used. If changing dimensions, update index.html's SVG viewBox too.
 function drawChart() {
   const rows = getRows();
   chart.replaceChildren();
@@ -49,7 +54,8 @@ function drawChart() {
   const x = (index) => left + index * plotWidth / Math.max(1, rows.length - 1);
   const y = (value) => top + plotHeight * (1 - value / yMaximum);
 
-  // Add another chart series here if you add an hourly field to demand.csv.
+  // Grid labels use MW. Add a chart series below, and a legend item in
+  // index.html, if a new hourly field should be visualized.
   for (let tick = 0; tick <= 4; tick++) {
     const value = yMaximum * tick / 4;
     svgElement("line", { x1: left, x2: width - right, y1: y(value), y2: y(value), class: "grid-line" });
@@ -77,12 +83,15 @@ function updateRequired(tr, redraw = true) {
   if (redraw) drawChart();
 }
 
-// The API returns CSV rows as strings; number inputs and getRows convert them for editing.
+// The API returns CSV rows as strings; number inputs and getRows convert them.
+// The table rows are created here, not in index.html. To add an editable hourly
+// field, add its cell here, read it in getRows(), and validate it in server.py.
 async function loadDemand() {
   const response = await fetch("api/demand");
   if (!response.ok) throw new Error("Could not load demand.csv");
   const rows = await response.json();
-  // Initialize the slider from the saved fleet's overall reserve ratio.
+  // Initialize the one slider from the saved day's overall reserve ratio.
+  // Saved hourly reserves may differ slightly after whole-MW rounding.
   const totalDemand = rows.reduce((sum, row) => sum + Number(row.demand_mw), 0);
   const totalReserve = rows.reduce((sum, row) => sum + Number(row.reserve_mw), 0);
   reserveSlider.value = totalDemand > 0
@@ -120,6 +129,7 @@ async function loadDemand() {
 }
 
 // Apply the selected percentage to every hour in the table and chart at once.
+// This changes only browser state until the user presses Save demand.csv.
 reserveSlider.addEventListener("input", () => {
   reserveOutput.value = `${reserveSlider.value}%`;
   for (const tr of hoursBody.querySelectorAll("tr")) updateRequired(tr, false);
@@ -127,7 +137,8 @@ reserveSlider.addEventListener("input", () => {
   status.textContent = "Reserve values changed. Click Save demand.csv to keep them.";
 });
 
-// Save sends every hour to server.py, where the complete set is checked before replacing demand.csv.
+// Save sends every hour to server.py, where the complete set is checked before
+// replacing demand.csv. The schedule tab reads the saved CSV on its next run.
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
   const rows = getRows();

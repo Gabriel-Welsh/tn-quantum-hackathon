@@ -1,3 +1,9 @@
+// Jupyter checkpoint of an obsolete plants.js, not served by server.py.
+// It records an old card-based editor that fetched /api/plants and POSTed rows
+// on Save. It lacks the current default-fleet and CSV-import handlers, and
+// refers to an old #add-plant button, so do not copy it into the live page.
+// Edit ../plants.js, ../index.html, and ../server.py for plant changes instead;
+// Jupyter may overwrite this snapshot automatically.
 const form = document.querySelector("#plants-form");
 const cards = document.querySelector("#plant-cards");
 const status = document.querySelector("#plants-status");

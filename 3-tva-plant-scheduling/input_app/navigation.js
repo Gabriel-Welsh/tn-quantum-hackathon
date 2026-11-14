@@ -1,16 +1,21 @@
-// Switch views with a URL fragment. qBraid Canvas keeps the same preview frame,
-// so clicking a tab does not request a new top-level page from Lab.
-// Unknown or empty fragments open Power plants so the starter fleet is visible on launch.
+// Page router for the three sections in index.html. Nav links set #plants,
+// #demand, or #schedule; no page reload is needed, so unsaved form edits survive
+// tab switches. Add a link, section ID, and value in the list below together.
+// Unknown or empty fragments open Power plants so the starter fleet is visible.
 function showPage() {
-  const active = location.hash === "#demand" ? "demand" : "plants";
-  // Keep both sections in the DOM so edits survive tab switches until Save or reload.
+  const requested = location.hash.slice(1);
+  const active = ["plants", "demand", "schedule"].includes(requested) ? requested : "plants";
+  // Keep all sections mounted and toggle only visibility; their JS modules can
+  // still read and update their own controls while another section is shown.
   document.querySelector("#plants-page").hidden = active !== "plants";
   document.querySelector("#demand-page").hidden = active !== "demand";
-  // aria-current marks the selected tab for assistive technology and CSS.
+  document.querySelector("#schedule-page").hidden = active !== "schedule";
+  // aria-current marks the selected tab for assistive technology and the
+  // highlighted nav style in styles.css. data-page-link must match the hash.
   for (const link of document.querySelectorAll("[data-page-link]")) {
     if (link.dataset.pageLink === active) link.setAttribute("aria-current", "page");
     else link.removeAttribute("aria-current");
   }
 }
-window.addEventListener("hashchange", showPage);
-showPage();
+window.addEventListener("hashchange", showPage); // Respond to tab clicks and browser back/forward.
+showPage(); // Apply the initial URL when the page first loads.

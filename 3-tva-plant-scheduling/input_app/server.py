@@ -1,4 +1,4 @@
-"""Local web app for editing plants.csv and hourly demand.csv.
+"""Local web app for editing inputs and viewing hourly plant schedules.
 
 From the project folder: python input_app/server.py
 In qBraid Lab, open the Lab URL's /proxy/8000/ path or use Agent Canvas.
@@ -8,10 +8,11 @@ import csv
 import json
 import math
 import os
+import sys
 import tempfile
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
-from urllib.parse import urlsplit
+from urllib.parse import parse_qs, urlsplit
 
 
 # Store edited CSVs beside this server, independent of the launch working directory.
@@ -19,6 +20,10 @@ FOLDER = Path(__file__).resolve().parent
 DEMAND_CSV = FOLDER / "demand.csv"
 PLANTS_CSV = FOLDER / "plants.csv"
 PORT = 8000
+
+# The existing checker lives beside input_app and provides schedule validation.
+sys.path.insert(0, str(FOLDER.parent))
+from algorithms import available
 
 # Add validation here when you add new numeric plant fields to plants.csv.
 PLANT_NUMBERS = (
@@ -132,6 +137,51 @@ def save_plants(submitted):
     write_csv(PLANTS_CSV, columns, rows)
 
 
+def build_schedule(algorithm_id):
+    """Run a local algorithm on saved inputs and validate its on/off matrix."""
+    from check import check_schedule, load_demand, load_plants
+
+    algorithms = available()
+    if algorithm_id not in algorithms:
+        raise ValueError("Unknown scheduling algorithm")
+    plants = load_plants(PLANTS_CSV)
+    demand, reserve = load_demand(DEMAND_CSV)
+    output = algorithms[algorithm_id]["solve"](plants, demand, reserve)
+    schedule = output.tolist() if hasattr(output, "tolist") else output
+    if (not isinstance(schedule, (list, tuple)) or len(schedule) != len(demand) or
+            any(not isinstance(row, (list, tuple)) or len(row) != len(plants) or
+                any(value not in (0, 1) for value in row) for row in schedule)):
+        raise ValueError("Algorithm must return one 0/1 row per hour and one column per plant")
+
+    result = check_schedule(plants, demand, reserve, schedule, ramps=True, verbose=False)
+    _, demand_rows = read_csv(DEMAND_CSV)
+    hours = []
+    for index, row in enumerate(schedule):
+        on = [plant for plant, enabled in zip(plants, row) if enabled]
+        hours.append({
+            "hour": int(demand_rows[index]["hour"]),
+            "demand_mw": int(demand[index]),
+            "reserve_mw": int(reserve[index]),
+            "plants_on": [plant["plant_id"] for plant in on],
+            "capacity_mw": round(sum(plant["pmax_mw"] for plant in on), 1),
+        })
+    return {
+        "algorithm": algorithm_id,
+        "name": algorithms[algorithm_id]["name"],
+        "valid": result["valid"],
+        "total_cost": round(result["total_cost"], 2),
+        "plants": [
+            {"id": plant["plant_id"], "pmax_mw": plant["pmax_mw"]}
+            for plant in plants
+        ],
+        "violations": [
+            {"hour": int(hour), "plant": plant, "rule": rule, "detail": detail}
+            for hour, plant, rule, detail in result["violations"]
+        ],
+        "hours": hours,
+    }
+
+
 # Small local-only HTTP server. New pages/assets need a GET route below; writes need a POST route.
 class Handler(BaseHTTPRequestHandler):
     def log_request(self, code="-", size="-"):
@@ -150,6 +200,24 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         # qBraid may append a query string. Route using just the path.
         path = urlsplit(self.path).path
+        if path == "/api/algorithms":
+            try:
+                items = [{"id": key, "name": item["name"], "description": item["description"]}
+                         for key, item in available().items()]
+                self.respond(200, json.dumps(items), "application/json; charset=utf-8")
+            except Exception as error:
+                self.respond(500, str(error))
+            return
+        if path == "/api/schedule":
+            algorithm_id = parse_qs(urlsplit(self.path).query).get("algorithm", ["classical_baseline"])[0]
+            try:
+                self.respond(200, json.dumps(build_schedule(algorithm_id)),
+                             "application/json; charset=utf-8")
+            except (ValueError, RuntimeError, ImportError) as error:
+                self.respond(400, str(error))
+            except Exception as error:
+                self.respond(500, f"Scheduling failed: {error}")
+            return
         # These API routes read the saved CSVs; browser import needs no upload endpoint.
         if path in ("/api/demand", "/api/plants"):
             csv_path = DEMAND_CSV if path == "/api/demand" else PLANTS_CSV
@@ -163,6 +231,7 @@ class Handler(BaseHTTPRequestHandler):
             "/app.js": ("app.js", "text/javascript; charset=utf-8"),
             "/navigation.js": ("navigation.js", "text/javascript; charset=utf-8"),
             "/plants.js": ("plants.js", "text/javascript; charset=utf-8"),
+            "/schedule.js": ("schedule.js", "text/javascript; charset=utf-8"),
             "/styles.css": ("styles.css", "text/css; charset=utf-8"),
             "/demand.csv": ("demand.csv", "text/csv; charset=utf-8"),
             "/plants.csv": ("plants.csv", "text/csv; charset=utf-8"),
