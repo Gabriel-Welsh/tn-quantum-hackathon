@@ -22,7 +22,7 @@ In Agent Canvas, use the tabs at the top to switch views.
 
 The app has four pages:
 
-- **Power plants**: choose **Use 10 default plants** to edit the starter fleet, or drop a CSV onto the upload area (or click **Add power plant .csv**) to import your own fleet. Review the rows, then click **Save plants.csv** to write `input_app/plants.csv`. Importing alone does not save. The CSV must have the same columns as `input_app/plants.csv`.
+- **Power plants**: choose **Use 10 default plants** to edit the starter fleet, or drop a CSV onto the upload area (or click **Add power plant .csv**) to import your own fleet. Use **Remove plant** on any card to take it out of the editor; at least one plant must remain. Click **Save plants.csv** to write the edited list to `input_app/plants.csv`. Importing or removing alone does not save. The CSV must have the same columns as `input_app/plants.csv`.
 - **Demand and reserve**: edit demand for each hour. Use the single reserve
   percentage slider above the chart to set reserve for every hour at once
   (rounded to whole MW). The solid line is demand; the dotted line is demand

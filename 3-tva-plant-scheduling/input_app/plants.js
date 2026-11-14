@@ -90,6 +90,15 @@ function parsePlantCsv(text) {
 
 // Build one card from a CSV/API row. data-field attributes connect each input
 // back to FIELDS in the Save handler; the heading follows edits to plant_id.
+// Removing a card changes only the editor until the user saves the full list.
+function updateRemoveButtons() {
+  const buttons = cards.querySelectorAll(".remove-plant");
+  for (const button of buttons) {
+    button.disabled = buttons.length <= 1;
+    button.title = button.disabled ? "Keep at least one power plant" : "";
+  }
+}
+
 function addCard(row = {}, isNew = false) {
   const card = document.createElement("article");
   card.className = "plant-card";
@@ -127,20 +136,34 @@ function addCard(row = {}, isNew = false) {
     if (field.key === "plant_id") {
       control.addEventListener("input", () => {
         heading.textContent = control.value.trim() || "New power plant";
+        remove.setAttribute("aria-label", `Remove ${heading.textContent}`);
       });
     }
     label.append(control);
     fields.append(label);
   }
   card.append(fields);
-  // The optional new-row controls are kept here for future manual-add UI.
-  if (isNew) {
-    const discard = document.createElement("button");
-    discard.type = "button";
-    discard.textContent = "Discard new plant";
-    discard.addEventListener("click", () => card.remove());
-    card.append(discard);
-  }
+  const remove = document.createElement("button");
+  remove.type = "button";
+  remove.className = "remove-plant";
+  remove.textContent = "Remove plant";
+  remove.setAttribute("aria-label", `Remove ${heading.textContent}`);
+  remove.addEventListener("click", () => {
+    const buttons = [...cards.querySelectorAll(".remove-plant")];
+    if (buttons.length <= 1) return;
+    const index = buttons.indexOf(remove);
+    const nextFocus = buttons[index + 1] || buttons[index - 1];
+    const name = heading.textContent;
+    card.remove();
+    updateRemoveButtons();
+    status.textContent = `${name} removed from the editor. Click Save plants.csv to keep this change.`;
+    // The last remaining Remove button is disabled, so move focus to its
+    // editable plant ID instead of leaving focus on the removed card.
+    (nextFocus.disabled
+      ? nextFocus.parentElement.querySelector('[data-field="plant_id"]')
+      : nextFocus).focus();
+  });
+  card.append(remove);
   cards.append(card);
   if (isNew) card.querySelector('[data-field="plant_id"]').focus();
 }
@@ -149,6 +172,7 @@ function addCard(row = {}, isNew = false) {
 function renderPlants(rows) {
   cards.replaceChildren();
   for (const row of rows) addCard(row);
+  updateRemoveButtons();
 }
 
 // Read the persisted CSV through the server API. JSON values arrive as strings,
