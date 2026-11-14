@@ -1,20 +1,30 @@
-// The R template writes this chart only when a QPU results CSV is available.
-// Reload the page after rerunning hardware_report.R to request the latest SVG.
-const reportStatus = document.querySelector("#hardware-report-status");
-const reportFigure = document.querySelector("#hardware-report-figure");
-const reportHistogram = document.querySelector("#hardware-report-histogram");
+// R generates charts only after a developer supplies and checks measured CSVs.
+// The inline SVG templates in index.html stay visible when a chart is missing.
+function loadReportChart(imageId, placeholderId, statusId, file, readyText, emptyText) {
+  const image = document.querySelector(imageId);
+  const placeholder = document.querySelector(placeholderId);
+  const status = document.querySelector(statusId);
+  image.addEventListener("load", () => {
+    image.hidden = false;
+    placeholder.hidden = true;
+    status.textContent = readyText;
+  });
+  image.addEventListener("error", () => {
+    image.hidden = true;
+    placeholder.hidden = false;
+    status.textContent = emptyText;
+  });
+  // A fresh URL avoids showing an old graph after R regenerates its SVG.
+  image.src = `${file}?version=${Date.now()}`;
+}
 
-reportStatus.textContent = "No quantum hardware results have been loaded yet.";
-// The SVG route returns 404 until the developer runs hardware_report.R.
-// Keep the figure hidden in that expected empty state.
-reportHistogram.addEventListener("load", () => {
-  reportFigure.hidden = false;
-  reportStatus.textContent = "QPU histogram generated from the supplied CSV.";
-});
-reportHistogram.addEventListener("error", () => {
-  reportFigure.hidden = true;
-  reportStatus.textContent = "No quantum hardware results have been loaded yet.";
-});
-// A new URL on each page load avoids displaying an older cached histogram
-// after the R template is rerun with a newer verified job CSV.
-reportHistogram.src = `hardware-histogram.svg?version=${Date.now()}`;
+loadReportChart(
+  "#speed-chart", "#speed-placeholder", "#speed-status", "runtime-comparison.svg",
+  "Measured benchmark chart loaded. Check the case definitions and timing method below.",
+  "No benchmark results added yet.",
+);
+loadReportChart(
+  "#hardware-report-histogram", "#qpu-placeholder", "#hardware-report-status", "hardware-histogram.svg",
+  "Measured QPU histogram loaded. Verify the job and device IDs below.",
+  "No QPU results added yet.",
+);

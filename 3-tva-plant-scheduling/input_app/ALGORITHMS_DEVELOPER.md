@@ -45,7 +45,7 @@ The sampled quantum distribution influences which candidates arrive first, but c
 
 The script's `--hours` selects which hours use the remote device; other hours still sample locally. A device run does **not** move the COBYLA loop or exact statevector objective onto hardware. Because each hour depends on the previous choice, a changed device outcome can alter later hours, even if only one hour uses the QPU. Its report compares the device's valid-shot share with the ideal local distribution and states whether the **final, possibly locally improved** choice is best. A job ID and device ID are the evidence of an actual remote run; a schedule shown in the app is not evidence of one. Check device availability and current price before a paid run.
 
-The separate **Quantum hardware report** tab is reserved for actual QPU measurements. `hardware_report.R` reads a developer-supplied CSV for one verified QPU job and writes `hardware-histogram.svg`; `hardware_report.js` displays that file after a page refresh. The page has no report chart until the SVG exists. The script never submits a job, and the `device_type=qpu` CSV field must be checked against the recorded device and job IDs.
+The separate **Quantum hardware report** tab has empty runtime and QPU chart templates. `hardware_report.R` reads developer-supplied benchmark and QPU CSVs and writes `runtime-comparison.svg` and `hardware-histogram.svg`; `hardware_report.js` displays each available SVG after a page refresh. The script never submits a job. Follow `HARDWARE_REPORT_TEMPLATE.md` and verify any `device_type=qpu` claim against the recorded device and job IDs.
 
 ## How the Jupyter notebooks differ
 

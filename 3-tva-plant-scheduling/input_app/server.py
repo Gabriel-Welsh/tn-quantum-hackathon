@@ -226,11 +226,11 @@ class Handler(BaseHTTPRequestHandler):
             _, rows = read_csv(csv_path)
             self.respond(200, json.dumps(rows), "application/json; charset=utf-8")
             return
-        # The R template creates this file only after a developer supplies QPU data.
-        if path == "/hardware-histogram.svg":
-            chart = FOLDER / "hardware-histogram.svg"
+        # Only these two R-generated report charts are public; CSV inputs stay local.
+        if path in ("/hardware-histogram.svg", "/runtime-comparison.svg"):
+            chart = FOLDER / path.removeprefix("/")
             if not chart.is_file():
-                self.respond(404, "No hardware report has been generated")
+                self.respond(404, "No measured report chart has been generated")
             else:
                 self.respond(200, chart.read_bytes(), "image/svg+xml")
             return

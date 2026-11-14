@@ -7,9 +7,9 @@ quantum jobs; it supplies only a local simulator schedule to the web app.
 
 from importlib.util import find_spec
 
-NAME = "QAOA (Gabe)"
+NAME = "QAOA"
 DESCRIPTION = (
-    "QAOA by Gabe: local one-layer simulator, 200 shots per hour, seed 7, "
+    "QAOA: local one-layer simulator, 200 shots per hour, seed 7, "
     "with the notebook-derived look-ahead and local search."
 )
 

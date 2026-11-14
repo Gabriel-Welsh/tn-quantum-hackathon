@@ -1,0 +1,20 @@
+<!doctype html>
+<!--
+  Legacy entry point for old links to plants.html. The maintained plant editor
+  is the #plants section of index.html, served by server.py at /. Redirect
+  there instead of keeping a second copy of the form. When changing the plant
+  UI, edit index.html and plants.js; this file only preserves old bookmarks.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Opening power plants</title>
+  <!-- ./ keeps the redirect inside the same qBraid /proxy/8000/ path. -->
+  <meta http-equiv="refresh" content="0; url=./#plants">
+</head>
+<body>
+  <!-- This link works if the browser does not follow the meta refresh. -->
+  <p>The power plant editor has moved to <a href="./#plants">the main app</a>.</p>
+</body>
+</html>
