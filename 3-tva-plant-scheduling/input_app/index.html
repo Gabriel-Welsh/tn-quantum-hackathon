@@ -1,8 +1,8 @@
 <!doctype html>
 <!--
-  Main app shell, served by server.py at /. All three views live in this file;
+  Main app shell, served by server.py at /. All four views live in this file;
   navigation.js shows one section based on the URL fragment (#plants, #demand,
-  or #schedule). Keep section IDs, control IDs, and data-page-link values in sync
+  #schedule, or #hardware-report). Keep section IDs, control IDs, and data-page-link values in sync
   with the JavaScript files that query them. CSS lives in styles.css.
 -->
 <html lang="en">
@@ -23,6 +23,7 @@
   <script type="module" src="app.js"></script>
   <script type="module" src="plants.js"></script>
   <script type="module" src="schedule.js"></script>
+  <script type="module" src="hardware_report.js"></script>
 </head>
 <body>
   <!--
@@ -34,6 +35,7 @@
     <a href="#plants" data-page-link="plants">Power plants</a>
     <a href="#demand" data-page-link="demand">Demand and reserve</a>
     <a href="#schedule" data-page-link="schedule">Plant schedule</a>
+    <a href="#hardware-report" data-page-link="hardware-report">Quantum hardware report</a>
   </nav>
 
   <!--
@@ -144,6 +146,8 @@
     </div>
     <!-- Description, progress/errors, validity, cost, and violations are filled by schedule.js. -->
     <p id="schedule-description"></p>
+    <p>QAOA implementation by Gabe.</p>
+    <p><strong>QAOA on this page uses a local statevector simulator. It does not run on an actual quantum computer.</strong></p>
     <p id="schedule-status" role="status" aria-live="polite"></p>
     <div id="schedule-summary"></div>
     <!--
@@ -167,16 +171,22 @@
         <tbody id="schedule-rows"></tbody>
       </table>
     </div>
-    <!--
-      Editable pitch draft. The text below is its initial value; schedule.js
-      saves user edits in this browser's localStorage under its caseStorageKey.
-      Changing this default does not overwrite a browser's previously saved text.
-    -->
+    <!-- Developer-maintained copy: edit this paragraph in index.html. -->
     <section class="quantum-case">
       <h2>Quantum computing outlook</h2>
-      <label for="quantum-case">Editable case draft</label>
-      <textarea id="quantum-case" rows="6">Current quantum computers are not yet reliable or large enough to outperform strong classical methods on realistic day-ahead plant scheduling. If hardware and algorithm trends continue, useful hybrid quantum methods could emerge in roughly 6–7 years. This is a scenario to test, not a forecast: we would compare solution quality, runtime, and cost with the classical baseline as the technology improves.</textarea>
+      <p>Current quantum computers are not yet reliable or large enough to outperform strong classical methods on realistic day-ahead plant scheduling. If hardware and algorithm trends continue, useful hybrid quantum methods could emerge in roughly 6–7 years. This is a scenario to test, not a forecast: we would compare solution quality, runtime, and cost with the classical baseline as the technology improves.</p>
     </section>
+  </section>
+
+  <!-- Hardware results are generated offline by hardware_report.R from a QPU CSV. -->
+  <section id="hardware-report-page" hidden>
+    <h1>QAOA on a quantum computer</h1>
+    <p>This report will show measured results from an actual quantum computer after a developer adds a QPU results CSV and runs the R template. No hardware result has been added yet.</p>
+    <p id="hardware-report-status" role="status" aria-live="polite"></p>
+    <figure id="hardware-report-figure" hidden>
+      <img id="hardware-report-histogram" alt="Histogram of measured QAOA bitstring counts from a QPU run">
+      <figcaption>Measured bitstring counts from the supplied QPU job.</figcaption>
+    </figure>
   </section>
 </body>
 </html>

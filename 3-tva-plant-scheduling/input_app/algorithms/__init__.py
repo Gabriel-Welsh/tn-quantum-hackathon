@@ -10,6 +10,8 @@ from pathlib import Path
 
 def available():
     """Return installed algorithms keyed by their Python filename."""
+    # New files appear after a page refresh. Existing imported modules stay
+    # cached by Python, so their edited code needs a server restart.
     invalidate_caches()
     algorithms = {}
     for path in sorted(Path(__file__).parent.glob("*.py")):
@@ -19,6 +21,7 @@ def available():
         if not callable(getattr(module, "solve", None)):
             raise ValueError(f"{path.name} must define solve(plants, demand, reserve)")
         algorithms[path.stem] = {
+            # The filename is the stable API ID; these values are display copy.
             "name": getattr(module, "NAME", path.stem.replace("_", " ").title()),
             "description": getattr(module, "DESCRIPTION", ""),
             "solve": module.solve,

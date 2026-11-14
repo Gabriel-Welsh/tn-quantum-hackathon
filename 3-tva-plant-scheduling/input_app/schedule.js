@@ -12,21 +12,23 @@ const rows = document.querySelector("#schedule-rows");
 const chartPanel = document.querySelector("#schedule-chart-panel");
 const chart = document.querySelector("#schedule-chart");
 const chartLegend = document.querySelector("#schedule-chart-legend");
-const caseBox = document.querySelector("#quantum-case");
-const caseStorageKey = "plant-scheduling-quantum-case";
 let algorithms = [];
-
-// The HTML textarea contains the starter pitch. A browser-local edit overrides
-// it on later visits; storage failures should never block scheduling.
-try { caseBox.value = localStorage.getItem(caseStorageKey) || caseBox.value; } catch (_) { /* Storage is optional. */ }
-caseBox.addEventListener("input", () => {
-  try { localStorage.setItem(caseStorageKey, caseBox.value); } catch (_) { /* Keep editing available. */ }
-});
+let latestScheduleRequest = 0;
 
 // The selector IDs come from Python filenames; labels and descriptions come
 // from each module's NAME and DESCRIPTION constants.
 function showDescription() {
   description.textContent = algorithms.find((item) => item.id === algorithmSelect.value)?.description || "";
+}
+
+// Jupyter's proxy can return an HTML error page when the local app is down.
+// Never place that HTML in the status area: it may contain session details.
+async function apiError(response) {
+  const body = await response.text();
+  if (response.headers?.get("content-type")?.includes("text/html") || /^\s*</.test(body)) {
+    return `Jupyter proxy error (HTTP ${response.status}). Check that the app server is running on port 8000, then try again.`;
+  }
+  return body.trim().slice(0, 300) || `HTTP ${response.status}`;
 }
 
 // SVG elements need their own namespace. This helper sets attributes without
@@ -128,7 +130,7 @@ function showChart(result) {
 }
 
 // Pair the chart with an explicit hourly table and checker summary. The
-// backend checks demand, reserve, operating limits, and ramps; schedules with
+// backend checks the notebook's demand, reserve, and minimum on/off rules; schedules with
 // rule violations remain visible so developers can inspect the first issues.
 function showSchedule(result) {
   showChart(result);
@@ -147,8 +149,8 @@ function showSchedule(result) {
   summary.replaceChildren();
   const report = document.createElement("p");
   report.textContent = result.valid
-    ? `${result.name}: valid for the modeled demand, reserve, plant limits, and ramps. Estimated day cost: $${result.total_cost.toLocaleString()}.`
-    : `${result.name}: ${result.violations.length} rule violation(s). Review this schedule before using it.`;
+    ? `${result.name}: no violations of the notebook's modeled rules. Estimated day cost: $${result.total_cost.toLocaleString()}.`
+    : `${result.name}: ${result.violations.length} notebook-rule violation(s). This algorithm's schedule needs review.`;
   summary.append(report);
   if (!result.valid) {
     const list = document.createElement("ul");
@@ -164,26 +166,35 @@ function showSchedule(result) {
 
 // Recompute from saved plants.csv and demand.csv. Clear old results before
 // fetching so they cannot be mistaken for the current algorithm's output.
+// Ignore a slower prior response if the user selects another algorithm.
 async function runSchedule() {
-  if (!algorithmSelect.value) return;
-  status.textContent = "Generating schedule…";
+  const selected = algorithmSelect.value;
+  if (!selected) return;
+  const request = ++latestScheduleRequest;
+  const name = algorithms.find((item) => item.id === selected)?.name || selected;
+  status.textContent = `Generating ${name} schedule…`;
   table.hidden = true;
   chartPanel.hidden = true;
   summary.replaceChildren();
   try {
-    const response = await fetch(`api/schedule?algorithm=${encodeURIComponent(algorithmSelect.value)}`);
-    if (!response.ok) throw new Error(await response.text());
-    showSchedule(await response.json());
+    const response = await fetch(`api/schedule?algorithm=${encodeURIComponent(selected)}`);
+    if (!response.ok) throw new Error(await apiError(response));
+    const result = await response.json();
+    if (request !== latestScheduleRequest) return;
+    showSchedule(result);
     status.textContent = "Generated from the saved plants.csv and demand.csv files.";
   } catch (error) {
-    status.textContent = `Schedule failed: ${error.message}`;
+    if (request === latestScheduleRequest) status.textContent = `Schedule failed: ${error.message}`;
   }
 }
 
-// The button reruns after saved input changes; selecting an algorithm updates
-// its description until the user explicitly generates its schedule.
+// The button reruns after saved input changes; selecting an algorithm also
+// generates it immediately, so the summary always matches the selector.
 document.querySelector("#run-schedule").addEventListener("click", runSchedule);
-algorithmSelect.addEventListener("change", showDescription);
+algorithmSelect.addEventListener("change", () => {
+  showDescription();
+  runSchedule();
+});
 
 // Fill the selector from the server's automatic Python-module discovery.
 // Prefer the classical baseline on initial load, then generate its schedule.
@@ -192,7 +203,7 @@ algorithmSelect.addEventListener("change", showDescription);
 async function loadAlgorithms() {
   try {
     const response = await fetch("api/algorithms");
-    if (!response.ok) throw new Error(await response.text());
+    if (!response.ok) throw new Error(await apiError(response));
     algorithms = await response.json();
     algorithmSelect.replaceChildren();
     for (const algorithm of algorithms) {
