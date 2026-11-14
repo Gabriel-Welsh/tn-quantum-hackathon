@@ -10,7 +10,7 @@ import math
 import os
 import sys
 import tempfile
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
@@ -153,7 +153,9 @@ def build_schedule(algorithm_id):
                 any(value not in (0, 1) for value in row) for row in schedule)):
         raise ValueError("Algorithm must return one 0/1 row per hour and one column per plant")
 
-    result = check_schedule(plants, demand, reserve, schedule, ramps=True, verbose=False)
+    # Match the notebooks' default checker. Ramps are a separate stretch goal;
+    # check_schedule's greedy dispatch can flag ramp errors for a MILP schedule.
+    result = check_schedule(plants, demand, reserve, schedule, verbose=False)
     _, demand_rows = read_csv(DEMAND_CSV)
     hours = []
     for index, row in enumerate(schedule):
@@ -224,6 +226,14 @@ class Handler(BaseHTTPRequestHandler):
             _, rows = read_csv(csv_path)
             self.respond(200, json.dumps(rows), "application/json; charset=utf-8")
             return
+        # Only these two R-generated report charts are public; CSV inputs stay local.
+        if path in ("/hardware-histogram.svg", "/runtime-comparison.svg"):
+            chart = FOLDER / path.removeprefix("/")
+            if not chart.is_file():
+                self.respond(404, "No measured report chart has been generated")
+            else:
+                self.respond(200, chart.read_bytes(), "image/svg+xml")
+            return
         # Only serve these known files; no user-supplied filesystem paths.
         files = {
             "/": ("index.html", "text/html; charset=utf-8"),
@@ -232,6 +242,7 @@ class Handler(BaseHTTPRequestHandler):
             "/navigation.js": ("navigation.js", "text/javascript; charset=utf-8"),
             "/plants.js": ("plants.js", "text/javascript; charset=utf-8"),
             "/schedule.js": ("schedule.js", "text/javascript; charset=utf-8"),
+            "/hardware_report.js": ("hardware_report.js", "text/javascript; charset=utf-8"),
             "/styles.css": ("styles.css", "text/css; charset=utf-8"),
             "/demand.csv": ("demand.csv", "text/csv; charset=utf-8"),
             "/plants.csv": ("plants.csv", "text/csv; charset=utf-8"),
@@ -263,8 +274,9 @@ class Handler(BaseHTTPRequestHandler):
             self.respond(400, str(error))
 
 
+# Threads keep the page and other algorithms responsive while local QAOA runs.
 # Bind to loopback; qBraid Lab exposes it through /proxy/8000 and Agent Canvas.
 if __name__ == "__main__":
-    server = HTTPServer(("127.0.0.1", PORT), Handler)
+    server = ThreadingHTTPServer(("127.0.0.1", PORT), Handler)
     print(f"Open the Lab URL's /proxy/{PORT}/ path (or http://127.0.0.1:{PORT}/ locally). Ctrl+C to stop.")
     server.serve_forever()

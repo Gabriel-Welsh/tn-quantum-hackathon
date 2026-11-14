@@ -1,8 +1,8 @@
 <!doctype html>
 <!--
-  Main app shell, served by server.py at /. All three views live in this file;
+  Main app shell, served by server.py at /. All four views live in this file;
   navigation.js shows one section based on the URL fragment (#plants, #demand,
-  or #schedule). Keep section IDs, control IDs, and data-page-link values in sync
+  #schedule, or #hardware-report). Keep section IDs, control IDs, and data-page-link values in sync
   with the JavaScript files that query them. CSS lives in styles.css.
 -->
 <html lang="en">
@@ -23,6 +23,7 @@
   <script type="module" src="app.js"></script>
   <script type="module" src="plants.js"></script>
   <script type="module" src="schedule.js"></script>
+  <script type="module" src="hardware_report.js"></script>
 </head>
 <body>
   <!--
@@ -34,6 +35,7 @@
     <a href="#plants" data-page-link="plants">Power plants</a>
     <a href="#demand" data-page-link="demand">Demand and reserve</a>
     <a href="#schedule" data-page-link="schedule">Plant schedule</a>
+    <a href="#hardware-report" data-page-link="hardware-report">Quantum hardware report</a>
   </nav>
 
   <!--
@@ -144,6 +146,7 @@
     </div>
     <!-- Description, progress/errors, validity, cost, and violations are filled by schedule.js. -->
     <p id="schedule-description"></p>
+    <p>QAOA implementation: this page runs a local statevector simulator, not an actual quantum computer.</p>
     <p id="schedule-status" role="status" aria-live="polite"></p>
     <div id="schedule-summary"></div>
     <!--
@@ -167,15 +170,77 @@
         <tbody id="schedule-rows"></tbody>
       </table>
     </div>
-    <!--
-      Editable pitch draft. The text below is its initial value; schedule.js
-      saves user edits in this browser's localStorage under its caseStorageKey.
-      Changing this default does not overwrite a browser's previously saved text.
-    -->
+    <!-- Developer-maintained outlook copy; edit this paragraph in index.html. -->
     <section class="quantum-case">
       <h2>Quantum computing outlook</h2>
-      <label for="quantum-case">Editable case draft</label>
-      <textarea id="quantum-case" rows="6">Current quantum computers are not yet reliable or large enough to outperform strong classical methods on realistic day-ahead plant scheduling. If hardware and algorithm trends continue, useful hybrid quantum methods could emerge in roughly 6–7 years. This is a scenario to test, not a forecast: we would compare solution quality, runtime, and cost with the classical baseline as the technology improves.</textarea>
+      <p>Current quantum computers are not yet reliable or large enough to outperform strong classical methods on realistic day-ahead plant scheduling. If hardware and algorithm trends continue, useful hybrid quantum methods could emerge in roughly 6–7 years. This is a scenario to test, not a forecast: we would compare solution quality, runtime, and cost with the classical baseline as the technology improves.</p>
+    </section>
+  </section>
+
+  <!--
+    Developer-maintained report template. Replace bracketed copy only after
+    measuring the hybrid against MILP on matched cases. The graphs begin empty;
+    hardware_report.R creates their SVGs from separate benchmark and QPU CSVs.
+  -->
+  <section id="hardware-report-page" hidden>
+    <h1>Quantum hardware report</h1>
+    <p>This page is a template for reporting a QAOA–MILP hybrid. A possible speed advantage is a <strong>hypothesis until measured</strong> against MILP on the same problems. The current Plant schedule QAOA option runs on a local simulator; this report is reserved for separate, verified hardware experiments.</p>
+
+    <section class="report-copy">
+      <h2>What we are testing</h2>
+      <p>[Describe the exact scheduling cases, plant counts, hours, operating rules, and why the hybrid might help. MILP is already strong on many problems with hundreds of variables; explain the specific bottleneck being tested.]</p>
+      <p>[Describe the hybrid: which commitment choices QAOA samples, which work MILP performs, and whether QAOA angles were tuned locally or on the QPU.]</p>
+    </section>
+
+    <section class="report-copy">
+      <h2>Runtime: MILP versus QAOA–MILP</h2>
+      <p>Compare complete wall-clock times for the same valid problem instances. Include QAOA preparation and tuning, sampling, queue time, data transfer, and MILP repair in the hybrid total. Record the hardware and software used for both methods.</p>
+      <figure class="report-figure">
+        <div id="speed-placeholder" class="report-placeholder" aria-label="Empty grouped bar graph template comparing MILP and QAOA–MILP runtime">
+          <svg viewBox="0 0 720 360" role="img" aria-labelledby="speed-title speed-desc">
+            <title id="speed-title">MILP versus QAOA–MILP runtime</title>
+            <desc id="speed-desc">No measured runtimes yet. Horizontal axis is matched scheduling cases; vertical axis is total wall-clock seconds.</desc>
+            <line x1="80" y1="35" x2="80" y2="280" class="report-axis"/>
+            <line x1="80" y1="280" x2="680" y2="280" class="report-axis"/>
+            <text x="380" y="325" text-anchor="middle">Matched scheduling cases</text>
+            <text x="24" y="155" text-anchor="middle" transform="rotate(-90 24 155)">Total wall-clock seconds</text>
+            <text x="380" y="155" text-anchor="middle" class="report-awaiting">Awaiting measured speed_results.csv</text>
+            <rect x="240" y="42" width="15" height="15" class="report-milp-key"/>
+            <text x="262" y="55">MILP</text>
+            <rect x="390" y="42" width="15" height="15" class="report-hybrid-key"/>
+            <text x="412" y="55">QAOA–MILP</text>
+          </svg>
+        </div>
+        <img id="speed-chart" alt="Measured grouped bars comparing MILP and QAOA–MILP total runtime by case" hidden>
+        <figcaption id="speed-status">No benchmark results added yet.</figcaption>
+      </figure>
+      <p>[Summarize the median speed difference, variability across trials, validity, and schedule cost. State whether the result includes QPU queue time. Do not describe a speedup until the chart contains real measurements.]</p>
+    </section>
+
+    <section class="report-copy">
+      <h2>Actual QPU results</h2>
+      <p>A QPU measures candidate commitment bitstrings. MILP still runs classically to validate and dispatch them. A job ID and QPU device ID should accompany any claim that the quantum step ran on hardware.</p>
+      <figure class="report-figure">
+        <div id="qpu-placeholder" class="report-placeholder" aria-label="Empty histogram template for measured QPU bitstrings">
+          <svg viewBox="0 0 720 360" role="img" aria-labelledby="qpu-title qpu-desc">
+            <title id="qpu-title">QPU measurement histogram</title>
+            <desc id="qpu-desc">No QPU measurements yet. Horizontal axis is measured bitstrings; vertical axis is shot counts.</desc>
+            <line x1="80" y1="35" x2="80" y2="280" class="report-axis"/>
+            <line x1="80" y1="280" x2="680" y2="280" class="report-axis"/>
+            <text x="380" y="325" text-anchor="middle">Measured bitstrings</text>
+            <text x="24" y="155" text-anchor="middle" transform="rotate(-90 24 155)">Shot counts</text>
+            <text x="380" y="155" text-anchor="middle" class="report-awaiting">Awaiting verified hardware_results.csv</text>
+          </svg>
+        </div>
+        <img id="hardware-report-histogram" alt="Measured bitstring counts from one verified QPU job" hidden>
+        <figcaption id="hardware-report-status">No QPU results added yet.</figcaption>
+      </figure>
+      <p>[Add QPU device ID, job ID, date, shots, circuit depth, two-qubit gate count, valid-shot share, and a comparison with the ideal or noisy simulator.]</p>
+    </section>
+
+    <section class="report-copy">
+      <h2>What the evidence suggests</h2>
+      <p>[Explain what the measured runtime and solution quality support. Describe the sizes tested, the limits of extrapolating to larger systems, and what hardware or algorithm improvements would be needed.]</p>
     </section>
   </section>
 </body>
