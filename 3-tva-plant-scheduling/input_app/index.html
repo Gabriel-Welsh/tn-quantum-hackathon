@@ -45,7 +45,7 @@
   -->
   <section id="plants-page" hidden>
     <h1>Power plants</h1>
-    <p>Choose how to build your plant list. Review the rows below, then save them to plants.csv.</p>
+    <p>Choose how to build your plant list. Edit or remove plants below, then save to plants.csv. Removing a plant takes effect when you save.</p>
     <!--
       Both choices replace the cards in the form. The default button uses the
       ten-plant snapshot in plants.js, independent of previously saved edits.
@@ -177,70 +177,34 @@
     </section>
   </section>
 
-  <!--
-    Developer-maintained report template. Replace bracketed copy only after
-    measuring the hybrid against MILP on matched cases. The graphs begin empty;
-    hardware_report.R creates their SVGs from separate benchmark and QPU CSVs.
-  -->
+  <!-- The report charts show the measured local HiGHS results. -->
   <section id="hardware-report-page" hidden>
     <h1>Quantum hardware report</h1>
-    <p>This page is a template for reporting a QAOA–MILP hybrid. A possible speed advantage is a <strong>hypothesis until measured</strong> against MILP on the same problems. The current Plant schedule QAOA option runs on a local simulator; this report is reserved for separate, verified hardware experiments.</p>
+    <p>These local warm-start experiments compare HiGHS with and without a proposed starting schedule.</p>
 
     <section class="report-copy">
       <h2>What we are testing</h2>
-      <p>[Describe the exact scheduling cases, plant counts, hours, operating rules, and why the hybrid might help. MILP is already strong on many problems with hundreds of variables; explain the specific bottleneck being tested.]</p>
-      <p>[Describe the hybrid: which commitment choices QAOA samples, which work MILP performs, and whether QAOA angles were tuned locally or on the QPU.]</p>
+      <p>The existing 24-hour experiments cover 5, 10, 20, and 40 plants. A coarse QUBO proposes plant commitments over time blocks; repair makes a candidate feasible, then HiGHS solves the full-day MILP using that candidate as a start. The 5- and 10-plant cases use locally simulated QAOA. The 20- and 40-plant cases use simulated annealing because their 80- and 160-bit QUBOs are too large for the current local QAOA setup. No QAOA angle tuning or sampling in these experiments ran on a QPU.</p>
+      <p>The question is whether a feasible starting schedule helps HiGHS find good solutions earlier or reduces its solve time on a harder instance. The cases measured so far all close at the root node, leaving little search tree to improve.</p>
     </section>
 
     <section class="report-copy">
-      <h2>Runtime: MILP versus QAOA–MILP</h2>
-      <p>Compare complete wall-clock times for the same valid problem instances. Include QAOA preparation and tuning, sampling, queue time, data transfer, and MILP repair in the hybrid total. Record the hardware and software used for both methods.</p>
+      <h2>Results we have: HiGHS stage only</h2>
+      <p>These are the published medians from <code>QUANTUM_WARM_START.md</code>, measured on a shared qBraid instance with one HiGHS thread. Each case used three solver runs, except 40 plants, which used two. Cold and warm runs both finished at one branch-and-bound node. The warm-start preparation, local sampling, and repair times are <strong>excluded</strong> from the solve-time graph.</p>
       <figure class="report-figure">
-        <div id="speed-placeholder" class="report-placeholder" aria-label="Empty grouped bar graph template comparing MILP and QAOA–MILP runtime">
-          <svg viewBox="0 0 720 360" role="img" aria-labelledby="speed-title speed-desc">
-            <title id="speed-title">MILP versus QAOA–MILP runtime</title>
-            <desc id="speed-desc">No measured runtimes yet. Horizontal axis is matched scheduling cases; vertical axis is total wall-clock seconds.</desc>
-            <line x1="80" y1="35" x2="80" y2="280" class="report-axis"/>
-            <line x1="80" y1="280" x2="680" y2="280" class="report-axis"/>
-            <text x="380" y="325" text-anchor="middle">Matched scheduling cases</text>
-            <text x="24" y="155" text-anchor="middle" transform="rotate(-90 24 155)">Total wall-clock seconds</text>
-            <text x="380" y="155" text-anchor="middle" class="report-awaiting">Awaiting measured speed_results.csv</text>
-            <rect x="240" y="42" width="15" height="15" class="report-milp-key"/>
-            <text x="262" y="55">MILP</text>
-            <rect x="390" y="42" width="15" height="15" class="report-hybrid-key"/>
-            <text x="412" y="55">QAOA–MILP</text>
-          </svg>
-        </div>
-        <img id="speed-chart" alt="Measured grouped bars comparing MILP and QAOA–MILP total runtime by case" hidden>
-        <figcaption id="speed-status">No benchmark results added yet.</figcaption>
+        <svg id="highs-time-chart" class="report-current-chart" role="img" aria-label="Median HiGHS solve seconds for cold and warm starts across four plant scheduling cases"></svg>
+        <figcaption>Median HiGHS solve time. Lower is better; small differences on this shared machine may be timing noise.</figcaption>
       </figure>
-      <p>[Summarize the median speed difference, variability across trials, validity, and schedule cost. State whether the result includes QPU queue time. Do not describe a speedup until the chart contains real measurements.]</p>
-    </section>
-
-    <section class="report-copy">
-      <h2>Actual QPU results</h2>
-      <p>A QPU measures candidate commitment bitstrings. MILP still runs classically to validate and dispatch them. A job ID and QPU device ID should accompany any claim that the quantum step ran on hardware.</p>
       <figure class="report-figure">
-        <div id="qpu-placeholder" class="report-placeholder" aria-label="Empty histogram template for measured QPU bitstrings">
-          <svg viewBox="0 0 720 360" role="img" aria-labelledby="qpu-title qpu-desc">
-            <title id="qpu-title">QPU measurement histogram</title>
-            <desc id="qpu-desc">No QPU measurements yet. Horizontal axis is measured bitstrings; vertical axis is shot counts.</desc>
-            <line x1="80" y1="35" x2="80" y2="280" class="report-axis"/>
-            <line x1="80" y1="280" x2="680" y2="280" class="report-axis"/>
-            <text x="380" y="325" text-anchor="middle">Measured bitstrings</text>
-            <text x="24" y="155" text-anchor="middle" transform="rotate(-90 24 155)">Shot counts</text>
-            <text x="380" y="155" text-anchor="middle" class="report-awaiting">Awaiting verified hardware_results.csv</text>
-          </svg>
-        </div>
-        <img id="hardware-report-histogram" alt="Measured bitstring counts from one verified QPU job" hidden>
-        <figcaption id="hardware-report-status">No QPU results added yet.</figcaption>
+        <svg id="highs-integral-chart" class="report-current-chart" role="img" aria-label="Median HiGHS primal-dual integral for cold and warm starts across four plant scheduling cases"></svg>
+        <figcaption>Median primal-dual integral. Lower means a good incumbent was available earlier during the solve; this is not an end-to-end speed measurement.</figcaption>
       </figure>
-      <p>[Add QPU device ID, job ID, date, shots, circuit depth, two-qubit gate count, valid-shot share, and a comparison with the ideal or noisy simulator.]</p>
+      <p>The warm start lowered the reported primal-dual integral in all four cases. HiGHS solve times were 0.202 → 0.195 s, 0.198 → 0.187 s, 0.607 → 0.505 s, and 3.081 → 3.021 s from 5 to 40 plants. The repaired starting schedules were 1.12%–2.19% above the optimum; HiGHS still reached the optimum in both modes.</p>
     </section>
 
     <section class="report-copy">
       <h2>What the evidence suggests</h2>
-      <p>[Explain what the measured runtime and solution quality support. Describe the sizes tested, the limits of extrapolating to larger systems, and what hardware or algorithm improvements would be needed.]</p>
+      <p>The local pipeline produced feasible warm starts close to optimal and improved the primal-dual integral, but it has not shown a material total-runtime advantage. All four measured MILPs solved at the root node; a harder case with a real search tree is needed to test whether the start can reduce search.</p>
     </section>
   </section>
 </body>

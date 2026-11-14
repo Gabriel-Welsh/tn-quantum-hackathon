@@ -14,7 +14,8 @@ An on bit means a plant is available, not that it produces its maximum MW. The c
 | --- | --- | --- | --- |
 | Classical baseline | `algorithms/classical_baseline.py` → `../check.py:solve_milp()` | One SciPy/HiGHS mixed-integer model for the entire saved horizon | Minimizes startup + no-load + dispatch energy under modeled demand, reserve, output, and minimum up/down constraints. Optional ramps are off in the app. |
 | Cheapest-first rule | `algorithms/cheapest_first.py` | Sorts plants once by `(marginal_cost_per_mwh + no_load_cost_per_h) / pmax_mw`; each hour adds plants in that order until sum of `pmax_mw` covers demand + reserve | A simple capacity rule. It does not optimize the full cost or enforce minimum up/down times, minimum output, or ramps when selecting. The checker reports violations. |
-| QAOA (Gabe) | `algorithms/qaoa.py` → `../run_qaoa_schedule.py:schedule_day()` | Builds and samples a one-hour QUBO for each hour, then classically selects and improves a valid commitment | Hybrid heuristic with future-plan look-ahead, classical feasibility checks, local search, and fallback enumeration. It does not solve one joint day-long QUBO. |
+| QAOA | `algorithms/qaoa.py` → `../run_qaoa_schedule.py:schedule_day()` | Builds and samples a one-hour QUBO for each hour, then classically selects and improves a valid commitment | Hybrid heuristic with future-plan look-ahead, classical feasibility checks, local search, and fallback enumeration. It does not solve one joint day-long QUBO. |
+| Quantum warm-start MILP | `algorithms/quantum_warm_start.py` → `../quantum_warm_start_milp.py` | Simulated QAOA proposes on/off choices for up to two demand-shaped time blocks; repair creates a feasible full-day start for HiGHS | HiGHS optimizes the full-day MILP after receiving the start. The app caps the QUBO at 16 bits, uses 200 local shots, and does not measure a speedup or run a QPU. Requires `highspy`. |
 
 The MILP uses binary on/off and startup variables plus continuous MW output per plant and hour. It enforces exact demand through dispatch, sufficient committed capacity for reserve, `pmin*u ≤ output ≤ pmax*u`, startup logic, and minimum up/down windows. `solve_milp(..., ramps=True)` adds ramp constraints; the app does not pass that flag. “Exact baseline” means the model is solved as a mixed-integer optimization problem for these rules. It is not a quantum algorithm.
 
@@ -34,6 +35,8 @@ For each hour, the shared script:
 
 The sampled quantum distribution influences which candidates arrive first, but classical validation, exact hourly costing, future-plan enumeration, local search, and possible full enumeration can determine the final answer. Report those contributions when comparing QAOA with random sampling or the MILP. The future-plan credit changes the selection score as well as the QUBO; the reported day cost remains the uncredited physical cost from `check_schedule()`.
 
+The **Quantum warm-start MILP** option uses a different QUBO: it groups the saved day into one or two time blocks, with one bit per plant per block. The wrapper tunes one-layer QAOA on a local NumPy statevector, samples 200 candidates, repairs up to 30, and passes the cheapest feasible candidate as a full MILP start to HiGHS. The final schedule is HiGHS's result. The app does not run a cold-versus-warm timing trial; use `../quantum_warm_start_milp.py` and `../QUANTUM_WARM_START.md` for that experiment. The saved 10-plant fleet uses one block under the app's 16-bit limit, which favors page responsiveness over the script's default research settings.
+
 ## Local simulation versus a real device
 
 | Run | Where angles are tuned | Where final shots come from | Cost and output |
@@ -44,8 +47,6 @@ The sampled quantum distribution influences which candidates arrive first, but c
 | Script with a QPU device ID | Local exact statevector | Physical device via qBraid | Device noise, finite shots and queue time affect counts. It can spend credits. The script estimates pricing, requests confirmation for a nonzero estimate, and saves job IDs in `qaoa_jobs.json` to resume. |
 
 The script's `--hours` selects which hours use the remote device; other hours still sample locally. A device run does **not** move the COBYLA loop or exact statevector objective onto hardware. Because each hour depends on the previous choice, a changed device outcome can alter later hours, even if only one hour uses the QPU. Its report compares the device's valid-shot share with the ideal local distribution and states whether the **final, possibly locally improved** choice is best. A job ID and device ID are the evidence of an actual remote run; a schedule shown in the app is not evidence of one. Check device availability and current price before a paid run.
-
-The separate **Quantum hardware report** tab has empty runtime and QPU chart templates. `hardware_report.R` reads developer-supplied benchmark and QPU CSVs and writes `runtime-comparison.svg` and `hardware-histogram.svg`; `hardware_report.js` displays each available SVG after a page refresh. The script never submits a job. Follow `HARDWARE_REPORT_TEMPLATE.md` and verify any `device_type=qpu` claim against the recorded device and job IDs.
 
 ## How the Jupyter notebooks differ
 
