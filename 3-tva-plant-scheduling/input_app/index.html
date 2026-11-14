@@ -177,11 +177,10 @@
     </section>
   </section>
 
-  <!-- Existing local benchmark results are shown separately from the still
-       unmeasured end-to-end and physical-QPU charts. -->
+  <!-- The report charts show the measured local HiGHS results. -->
   <section id="hardware-report-page" hidden>
     <h1>Quantum hardware report</h1>
-    <p>We have local warm-start experiments, but no verified physical-QPU results or matched end-to-end runtime comparison. The graphs below distinguish measured HiGHS behavior from the evidence still needed for a hardware claim.</p>
+    <p>These local warm-start experiments compare HiGHS with and without a proposed starting schedule.</p>
 
     <section class="report-copy">
       <h2>What we are testing</h2>
@@ -204,54 +203,8 @@
     </section>
 
     <section class="report-copy">
-      <h2>End-to-end runtime: awaiting matched trials</h2>
-      <p>A fair comparison needs total wall-clock time for the same valid cases, including QAOA or annealing preparation, tuning, sampling, repair, and HiGHS. A QPU run would also include queue and transfer time. The current measurements do not include those components, so they cannot establish an end-to-end speedup.</p>
-      <figure class="report-figure">
-        <div id="speed-placeholder" class="report-placeholder" aria-label="Empty grouped bar graph template comparing MILP and QAOA–MILP runtime">
-          <svg viewBox="0 0 720 360" role="img" aria-labelledby="speed-title speed-desc">
-            <title id="speed-title">MILP versus QAOA–MILP runtime</title>
-            <desc id="speed-desc">No measured runtimes yet. Horizontal axis is matched scheduling cases; vertical axis is total wall-clock seconds.</desc>
-            <line x1="80" y1="35" x2="80" y2="280" class="report-axis"/>
-            <line x1="80" y1="280" x2="680" y2="280" class="report-axis"/>
-            <text x="380" y="325" text-anchor="middle">Matched scheduling cases</text>
-            <text x="24" y="155" text-anchor="middle" transform="rotate(-90 24 155)">Total wall-clock seconds</text>
-            <text x="380" y="155" text-anchor="middle" class="report-awaiting">Awaiting measured speed_results.csv</text>
-            <rect x="240" y="42" width="15" height="15" class="report-milp-key"/>
-            <text x="262" y="55">MILP</text>
-            <rect x="390" y="42" width="15" height="15" class="report-hybrid-key"/>
-            <text x="412" y="55">QAOA–MILP</text>
-          </svg>
-        </div>
-        <img id="speed-chart" alt="Measured grouped bars comparing MILP and QAOA–MILP total runtime by case" hidden>
-        <figcaption id="speed-status">No matched end-to-end benchmark results added yet.</figcaption>
-      </figure>
-      <p>To populate this comparison, collect repeated cold and complete hybrid timings on identical inputs, validate both final schedules with the same checker and cost model, and record machine, software versions, seeds, shots, and backend. The chart generator accepts those trials in <code>speed_results.csv</code>.</p>
-    </section>
-
-    <section class="report-copy">
-      <h2>Actual QPU results</h2>
-      <p>No physical-QPU job or measured bitstring counts are recorded for this project. The existing <code>output.csv</code> labels its 24-hour schedule as <code>simulator</code> and has no job ID, so it cannot populate a hardware histogram. A QPU would measure candidate commitment bitstrings; repair and MILP would still run classically.</p>
-      <figure class="report-figure">
-        <div id="qpu-placeholder" class="report-placeholder" aria-label="Empty histogram template for measured QPU bitstrings">
-          <svg viewBox="0 0 720 360" role="img" aria-labelledby="qpu-title qpu-desc">
-            <title id="qpu-title">QPU measurement histogram</title>
-            <desc id="qpu-desc">No QPU measurements yet. Horizontal axis is measured bitstrings; vertical axis is shot counts.</desc>
-            <line x1="80" y1="35" x2="80" y2="280" class="report-axis"/>
-            <line x1="80" y1="280" x2="680" y2="280" class="report-axis"/>
-            <text x="380" y="325" text-anchor="middle">Measured bitstrings</text>
-            <text x="24" y="155" text-anchor="middle" transform="rotate(-90 24 155)">Shot counts</text>
-            <text x="380" y="155" text-anchor="middle" class="report-awaiting">Awaiting verified hardware_results.csv</text>
-          </svg>
-        </div>
-        <img id="hardware-report-histogram" alt="Measured bitstring counts from one verified QPU job" hidden>
-        <figcaption id="hardware-report-status">No QPU results added yet.</figcaption>
-      </figure>
-      <p>To populate this histogram, save the device and job IDs for one verified physical-QPU run, its full bitstring counts and total shots, and the circuit's depth and two-qubit gate count. Then calculate the valid-shot share and compare those counts with an ideal or noisy simulator for the same circuit. The chart generator accepts these counts in <code>hardware_results.csv</code>.</p>
-    </section>
-
-    <section class="report-copy">
       <h2>What the evidence suggests</h2>
-      <p>The local pipeline produced feasible warm starts close to optimal and improved the primal-dual integral, but it has not shown a material total-runtime advantage. All four measured MILPs solved at the root node; a harder case with a real search tree is needed to test whether the start can reduce search. Physical hardware also needs a smaller, shallower circuit and a measured QPU run before any hardware-performance conclusion is possible.</p>
+      <p>The local pipeline produced feasible warm starts close to optimal and improved the primal-dual integral, but it has not shown a material total-runtime advantage. All four measured MILPs solved at the root node; a harder case with a real search tree is needed to test whether the start can reduce search.</p>
     </section>
   </section>
 </body>

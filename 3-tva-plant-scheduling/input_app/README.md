@@ -44,16 +44,7 @@ The app has four pages:
   actual quantum computer**. The Quantum computing outlook is developer-maintained
   text in `index.html`; visitors cannot edit it.
 - **Quantum hardware report**: charts the existing local HiGHS solve-time and
-  primal-dual-integral medians, clearly separated from the still-empty
-  end-to-end runtime and physical-QPU graphs. Those two graphs require measured
-  CSVs. The app never submits a QPU job or claims a hybrid speedup without data.
-
-To populate either graph, follow [HARDWARE_REPORT_TEMPLATE.md](HARDWARE_REPORT_TEMPLATE.md),
-copy the corresponding header-only example CSV, add measured rows, run
-`Rscript hardware_report.R` from `input_app/`, and refresh the browser. The R
-script writes `runtime-comparison.svg` and/or `hardware-histogram.svg` only
-when their inputs are present and valid. Verify any claimed QPU run against its
-device and job IDs.
+  primal-dual-integral medians from the warm-start experiments.
 
 ## Add a scheduling algorithm
 

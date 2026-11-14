@@ -1,12 +1,12 @@
 # Hardware report data template
 
-The **Quantum hardware report** tab in `index.html` is developer maintained. It currently graphs the archived local HiGHS-only medians from `../QUANTUM_WARM_START.md`; these are not complete hybrid runtimes or physical-QPU results. Its two other graph templates stay empty until measured end-to-end trials and verified QPU counts are supplied. `hardware_report.R` generates those final SVG charts from the CSVs below; the browser displays each SVG after a refresh. Run the script from `input_app/`:
+The **Quantum hardware report** tab in `index.html` graphs the archived local HiGHS-only medians from `../QUANTUM_WARM_START.md`; these are not complete hybrid runtimes or physical-QPU results. The report no longer displays empty end-to-end or QPU graph templates. `hardware_report.R` can generate standalone SVG charts from the CSVs below. Run the script from `input_app/`:
 
 ```bash
 Rscript hardware_report.R
 ```
 
-The script skips a missing CSV, so the two graphs can be completed independently. Copy the header-only `speed_results.example.csv` to `speed_results.csv` and `hardware_results.example.csv` to `hardware_results.csv`, then add **measured** rows. The example files contain no results.
+The script skips a missing CSV, so the two standalone graphs can be completed independently. Copy the header-only `speed_results.example.csv` to `speed_results.csv` and `hardware_results.example.csv` to `hardware_results.csv`, then add **measured** rows. The example files contain no results.
 
 ## Runtime comparison: `speed_results.csv`
 
