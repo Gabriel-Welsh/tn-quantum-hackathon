@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hourly demand editor</title>
+  <style>
+    body { font: 16px system-ui, sans-serif; max-width: 760px; margin: 2rem auto; padding: 0 1rem; color: #182230; }
+    h1 { margin-bottom: .25rem; }
+    p { line-height: 1.5; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border-bottom: 1px solid #ccd3db; padding: .45rem; text-align: left; }
+    th { background: #edf2f7; }
+    input { font: inherit; width: 8rem; padding: .3rem; }
+    button { font: inherit; padding: .55rem 1rem; margin-top: 1rem; cursor: pointer; }
+    #status { min-height: 1.5rem; }
+    @media (prefers-color-scheme: dark) {
+      body { color: #e5ebf2; background: #15202d; }
+      th { background: #253548; }
+      td, th { border-color: #49586b; }
+    }
+  </style>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <h1>Hourly demand</h1>
+  <p>Enter demand in MW for any hour, then save. Reserve is calculated as 10% of demand.</p>
+  <form id="demand-form">
+    <table>
+      <thead><tr><th>Hour</th><th>Demand (MW)</th><th>Reserve (MW)</th></tr></thead>
+      <tbody id="hours"></tbody>
+    </table>
+    <button type="submit">Save CSV</button>
+  </form>
+  <p id="status" role="status" aria-live="polite"></p>
+  <p>Files: <a href="demand.csv" download>download demand.csv</a> ·
+    <a href="plants.csv" download>download plants.csv</a></p>
+</body>
+</html>

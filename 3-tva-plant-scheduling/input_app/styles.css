@@ -1,0 +1,54 @@
+:root { color-scheme: light dark; font: 16px system-ui, sans-serif; }
+body { max-width: 1000px; margin: 2rem auto; padding: 0 1rem 3rem; color: #182230; background: #fff; }
+h1 { margin-bottom: .25rem; }
+p { line-height: 1.5; }
+nav { display: flex; gap: 1rem; margin: 1rem 0 1.5rem; }
+nav a { padding: .55rem .8rem; border-radius: .35rem; color: #125185; }
+nav a[aria-current="page"] { background: #e4f0fa; font-weight: 700; }
+a { color: #125185; }
+button, input, select { font: inherit; }
+button { padding: .55rem 1rem; cursor: pointer; }
+.actions { display: flex; align-items: center; gap: .75rem; margin: 1rem 0; flex-wrap: wrap; }
+#status { min-height: 1.5rem; }
+.chart-frame { border: 1px solid #ccd3db; border-radius: .5rem; padding: .75rem; }
+.chart-frame svg { display: block; width: 100%; height: auto; }
+.legend { display: flex; gap: 1.5rem; margin: .5rem 0 0; flex-wrap: wrap; }
+.legend span::before { content: ""; display: inline-block; width: 2rem; vertical-align: middle; margin-right: .4rem; border-top: 3px solid #1176b7; }
+.legend .reserve::before { border-top: 3px dashed #d45a21; }
+.grid-line { stroke: #cbd5df; stroke-width: 1; }
+.axis-label { fill: #526273; font-size: 12px; }
+.demand-line { fill: none; stroke: #1176b7; stroke-width: 3; }
+.reserve-line { fill: none; stroke: #d45a21; stroke-width: 3; stroke-dasharray: 7 5; }
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; }
+th, td { border-bottom: 1px solid #ccd3db; padding: .45rem; text-align: left; }
+th { background: #edf2f7; }
+table input { width: 8rem; padding: .3rem; }
+.plant-card { border: 1px solid #ccd3db; border-radius: .5rem; padding: 1rem; margin: 1rem 0; }
+.plant-card h2 { margin: 0 0 .8rem; }
+.fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: .9rem; }
+.fields label { display: flex; flex-direction: column; gap: .3rem; font-size: .9rem; }
+.fields input, .fields select { padding: .4rem; width: 100%; box-sizing: border-box; }
+@media (prefers-color-scheme: dark) {
+  body { color: #e5ebf2; background: #15202d; }
+  nav a, a { color: #8ecbff; }
+  nav a[aria-current="page"] { background: #253548; }
+  .chart-frame, .plant-card, th, td { border-color: #49586b; }
+  th { background: #253548; }
+  .grid-line { stroke: #475769; }
+  .axis-label { fill: #b6c4d3; }
+}
+
+.plant-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1rem 0 1.5rem; }
+.plant-option { border: 1px solid #ccd3db; border-radius: .5rem; padding: 1rem; }
+.plant-option h2 { margin: 0; font-size: 1.1rem; }
+.plant-option p { margin: .6rem 0 1rem; }
+.csv-drop-zone { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .5rem; min-height: 5rem; padding: 1rem; border: 2px dashed #8998a8; border-radius: .5rem; cursor: pointer; text-align: center; }
+.csv-drop-zone.drag-over, .csv-drop-zone:focus-within { border-color: #1176b7; background: #e4f0fa; }
+.csv-drop-zone input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.file-button { padding: .55rem .8rem; border-radius: .35rem; background: #125185; color: white; font-weight: 600; }
+@media (prefers-color-scheme: dark) {
+  .plant-option { border-color: #49586b; }
+  .csv-drop-zone.drag-over, .csv-drop-zone:focus-within { background: #253548; }
+  .file-button { background: #3383bb; }
+}

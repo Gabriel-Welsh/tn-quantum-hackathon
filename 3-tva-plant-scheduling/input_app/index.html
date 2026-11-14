@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Plant scheduling editor</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="navigation.js" defer></script>
+  <script src="app.js" defer></script>
+  <script src="plants.js" defer></script>
+</head>
+<body>
+  <nav aria-label="Pages">
+    <a href="#plants" data-page-link="plants">Power plants</a>
+    <a href="#demand" data-page-link="demand">Demand and reserve</a>
+  </nav>
+
+  <section id="plants-page" hidden>
+    <h1>Power plants</h1>
+    <p>Choose how to build your plant list. Review the rows below, then save them to plants.csv.</p>
+    <div class="plant-options">
+      <div class="plant-option">
+        <h2>Manually edit 10 default plants</h2>
+        <p>Start with the 10 example plants and change their values below.</p>
+        <button type="button" id="load-default-plants">Use 10 default plants</button>
+      </div>
+      <div class="plant-option">
+        <h2>Add your own plants via CSV</h2>
+        <p>Import a CSV with the same columns as plants.csv. Its rows replace the plants currently shown below.</p>
+        <label class="csv-drop-zone" id="plant-csv-drop-zone">
+          <input type="file" id="plant-csv-file" accept=".csv,text/csv">
+          <span>Drop a .csv file here, or</span>
+          <span class="file-button">Add power plant .csv</span>
+        </label>
+      </div>
+    </div>
+    <form id="plants-form">
+      <div class="actions">
+        <button type="submit">Save plants.csv</button>
+        <a href="plants.csv" download>Download plants.csv</a>
+      </div>
+      <p id="plants-status" role="status" aria-live="polite"></p>
+      <div id="plant-cards"></div>
+    </form>
+  </section>
+
+  <section id="demand-page">
+    <h1>Demand and reserve</h1>
+    <p>The solid line shows demand. The dotted line shows demand plus reserve: the capacity needed each hour. Edit either column below and the chart updates before you save.</p>
+    <div class="chart-frame">
+      <svg id="demand-chart" viewBox="0 0 760 300" role="img" aria-label="Hourly demand and demand plus reserve chart"></svg>
+      <div class="legend"><span>Demand</span><span class="reserve">Demand + reserve</span></div>
+    </div>
+    <form id="demand-form">
+      <div class="actions">
+        <button type="submit">Save demand.csv</button>
+        <button type="button" id="reserve-ten">Set all reserves to 10% of demand</button>
+        <a href="demand.csv" download>Download demand.csv</a>
+      </div>
+      <p id="demand-status" role="status" aria-live="polite"></p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Hour</th><th>Demand (MW)</th><th>Reserve (MW)</th><th>Required capacity (MW)</th></tr></thead>
+          <tbody id="hours"></tbody>
+        </table>
+      </div>
+    </form>
+  </section>
+</body>
+</html>
