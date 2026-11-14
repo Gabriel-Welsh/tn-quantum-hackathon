@@ -1,6 +1,8 @@
 const form = document.querySelector("#plants-form");
 const cards = document.querySelector("#plant-cards");
 const status = document.querySelector("#plants-status");
+const csvInput = document.querySelector("#plant-csv-file");
+const dropZone = document.querySelector("#plant-csv-drop-zone");
 
 // To expose another plants.csv column, add its label and input type here,
 // then add validation for it in server.py.
@@ -20,7 +22,61 @@ const FIELDS = [
   { key: "scale", label: "Scale", type: "number", min: 0, step: "any" },
 ];
 
+// Snapshot of ../data/plants10.csv. Keep this independent of the editable plants.csv.
+const DEFAULT_PLANTS_CSV = `plant_id,type,pmin_mw,pmax_mw,marginal_cost_per_mwh,no_load_cost_per_h,startup_cost,min_up_h,min_down_h,ramp_mw_per_h,on_at_start,rts_gen_uid,scale
+COAL,coal steam,140,350,21.69,546,36750,24,48,240,1,123_STEAM_3,1.0
+GAS_CC,gas combined cycle,168,350,26.84,206,27650,8,5,245,0,107_CC_1,0.986
+PEAKER_A,gas combustion turbine,20,50,28.89,443,5150,3,3,202,0,113_CT_1,0.909
+PEAKER_B,gas combustion turbine (older),20,50,39.51,749,5150,3,3,202,0,223_CT_4,0.909
+OIL,oil combustion turbine,20,50,101.02,694,130,1,1,450,0,101_CT_1,2.5
+COAL_MID,coal steam (mid size),60,150,21.68,378,22050,8,8,174,1,116_STEAM_1,0.968
+COAL_SMALL,coal steam (small),39,100,23.8,145,14700,8,4,158,0,201_STEAM_3,1.316
+GAS_CC_2,gas combined cycle,144,300,28.59,262,23700,8,5,210,0,213_CC_3,0.845
+PEAKER_C,gas combustion turbine,20,50,25.91,420,5150,3,3,202,0,322_CT_5,0.909
+OIL_2,oil combustion turbine,20,50,101.02,694,130,1,1,450,0,101_CT_2,2.5`;
+
+function parsePlantCsv(text) {
+  const records = [];
+  let record = [];
+  let value = "";
+  let quoted = false;
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    if (char === '"') {
+      if (quoted && text[i + 1] === '"') { value += '"'; i++; }
+      else if (quoted || value === "") quoted = !quoted;
+      else throw new Error("Invalid CSV quote");
+    } else if (char === "," && !quoted) {
+      record.push(value);
+      value = "";
+    } else if ((char === "\n" || char === "\r") && !quoted) {
+      if (char === "\r" && text[i + 1] === "\n") i++;
+      record.push(value);
+      if (record.some((cell) => cell !== "")) records.push(record);
+      record = [];
+      value = "";
+    } else {
+      value += char;
+    }
+  }
+  if (quoted) throw new Error("Unclosed CSV quote");
+  record.push(value);
+  if (record.some((cell) => cell !== "")) records.push(record);
+  const header = records.shift();
+  const columns = FIELDS.map((field) => field.key);
+  if (!header || header.length !== columns.length ||
+      new Set(header).size !== columns.length ||
+      !columns.every((column) => header.includes(column))) {
+    throw new Error("CSV columns must match plants.csv");
+  }
+  if (!records.length || records.some((row) => row.length !== header.length)) {
+    throw new Error("CSV needs complete plant rows");
+  }
+  return records.map((row) => Object.fromEntries(header.map((key, index) => [key, row[index]])));
+}
+
 function addCard(row = {}, isNew = false) {
+  const card = document.createElement("article");
   card.className = "plant-card";
   const heading = document.createElement("h2");
   heading.textContent = row.plant_id || "New power plant";
@@ -72,15 +128,47 @@ function addCard(row = {}, isNew = false) {
   if (isNew) card.querySelector('[data-field="plant_id"]').focus();
 }
 
-async function loadPlants() {
-  const response = await fetch("api/plants");
-  if (!response.ok) throw new Error("Could not load plants.csv");
-  const rows = await response.json();
+function renderPlants(rows) {
   cards.replaceChildren();
   for (const row of rows) addCard(row);
 }
 
-document.querySelector("#add-plant").addEventListener("click", () => addCard({}, true));
+async function loadPlants() {
+  const response = await fetch("api/plants");
+  if (!response.ok) throw new Error("Could not load plants.csv");
+  renderPlants(await response.json());
+}
+
+document.querySelector("#load-default-plants").addEventListener("click", () => {
+  renderPlants(parsePlantCsv(DEFAULT_PLANTS_CSV));
+  status.textContent = "Loaded 10 default plants. Click Save plants.csv to keep them.";
+});
+
+async function importPlantFile(file) {
+  if (!file) return;
+  try {
+    const rows = parsePlantCsv(await file.text());
+    renderPlants(rows);
+    status.textContent = `Loaded ${rows.length} plants from ${file.name}. Click Save plants.csv to keep them.`;
+  } catch (error) {
+    status.textContent = `Import failed: ${error.message}`;
+  }
+}
+
+csvInput.addEventListener("change", () => {
+  importPlantFile(csvInput.files[0]);
+  csvInput.value = "";
+});
+dropZone.addEventListener("dragover", (event) => {
+  event.preventDefault();
+  dropZone.classList.add("drag-over");
+});
+dropZone.addEventListener("dragleave", () => dropZone.classList.remove("drag-over"));
+dropZone.addEventListener("drop", (event) => {
+  event.preventDefault();
+  dropZone.classList.remove("drag-over");
+  importPlantFile(event.dataTransfer.files[0]);
+});
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();

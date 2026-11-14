@@ -1,9 +1,22 @@
 # Power plant and demand editor
 
-From this project folder, run `python input_app/server.py`. In qBraid Lab,
-open the Lab URL with `/lab` replaced by `/proxy/8000/` (keep any URL prefix
-before `/lab`). You can also preview the running app in Agent Canvas with
-`qbraid-canvas --port 8000 --title "Plant Scheduling Editor"`.
+## Open in qBraid Lab
+
+1. In a Lab terminal, change to this `input_app` directory and start the server:
+
+   ```bash
+   python server.py
+   ```
+
+2. In another Lab terminal, open it in Agent Canvas:
+
+   ```bash
+   qbraid-canvas --port 8000 --title "Plant Scheduling Editor"
+   ```
+
+   Alternatively, replace `/lab` in your Lab URL with `/proxy/8000/`, keeping
+   any URL prefix before `/lab`. Keep the server terminal running while you use
+   the app; press Ctrl+C there to stop it.
 
 In Agent Canvas, use the tabs at the top to switch views.
 
