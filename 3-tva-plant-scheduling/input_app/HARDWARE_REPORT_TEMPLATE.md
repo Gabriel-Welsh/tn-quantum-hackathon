@@ -1,6 +1,6 @@
 # Hardware report data template
 
-The **Quantum hardware report** tab in `index.html` is developer maintained. Replace its bracketed paragraphs with measured methods and findings. Its two empty graph templates show the intended axes without invented data. `hardware_report.R` generates the final SVG charts from the CSVs below; the browser displays each SVG after a refresh. Run the script from `input_app/`:
+The **Quantum hardware report** tab in `index.html` is developer maintained. It currently graphs the archived local HiGHS-only medians from `../QUANTUM_WARM_START.md`; these are not complete hybrid runtimes or physical-QPU results. Its two other graph templates stay empty until measured end-to-end trials and verified QPU counts are supplied. `hardware_report.R` generates those final SVG charts from the CSVs below; the browser displays each SVG after a refresh. Run the script from `input_app/`:
 
 ```bash
 Rscript hardware_report.R

@@ -177,24 +177,35 @@
     </section>
   </section>
 
-  <!--
-    Developer-maintained report template. Replace bracketed copy only after
-    measuring the hybrid against MILP on matched cases. The graphs begin empty;
-    hardware_report.R creates their SVGs from separate benchmark and QPU CSVs.
-  -->
+  <!-- Existing local benchmark results are shown separately from the still
+       unmeasured end-to-end and physical-QPU charts. -->
   <section id="hardware-report-page" hidden>
     <h1>Quantum hardware report</h1>
-    <p>This page is a template for reporting a QAOA–MILP hybrid. A possible speed advantage is a <strong>hypothesis until measured</strong> against MILP on the same problems. The current Plant schedule QAOA option runs on a local simulator; this report is reserved for separate, verified hardware experiments.</p>
+    <p>We have local warm-start experiments, but no verified physical-QPU results or matched end-to-end runtime comparison. The graphs below distinguish measured HiGHS behavior from the evidence still needed for a hardware claim.</p>
 
     <section class="report-copy">
       <h2>What we are testing</h2>
-      <p>[Describe the exact scheduling cases, plant counts, hours, operating rules, and why the hybrid might help. MILP is already strong on many problems with hundreds of variables; explain the specific bottleneck being tested.]</p>
-      <p>[Describe the hybrid: which commitment choices QAOA samples, which work MILP performs, and whether QAOA angles were tuned locally or on the QPU.]</p>
+      <p>The existing 24-hour experiments cover 5, 10, 20, and 40 plants. A coarse QUBO proposes plant commitments over time blocks; repair makes a candidate feasible, then HiGHS solves the full-day MILP using that candidate as a start. The 5- and 10-plant cases use locally simulated QAOA. The 20- and 40-plant cases use simulated annealing because their 80- and 160-bit QUBOs are too large for the current local QAOA setup. No QAOA angle tuning or sampling in these experiments ran on a QPU.</p>
+      <p>The question is whether a feasible starting schedule helps HiGHS find good solutions earlier or reduces its solve time on a harder instance. The cases measured so far all close at the root node, leaving little search tree to improve.</p>
     </section>
 
     <section class="report-copy">
-      <h2>Runtime: MILP versus QAOA–MILP</h2>
-      <p>Compare complete wall-clock times for the same valid problem instances. Include QAOA preparation and tuning, sampling, queue time, data transfer, and MILP repair in the hybrid total. Record the hardware and software used for both methods.</p>
+      <h2>Results we have: HiGHS stage only</h2>
+      <p>These are the published medians from <code>QUANTUM_WARM_START.md</code>, measured on a shared qBraid instance with one HiGHS thread. Each case used three solver runs, except 40 plants, which used two. Cold and warm runs both finished at one branch-and-bound node. The warm-start preparation, local sampling, and repair times are <strong>excluded</strong> from the solve-time graph.</p>
+      <figure class="report-figure">
+        <svg id="highs-time-chart" class="report-current-chart" role="img" aria-label="Median HiGHS solve seconds for cold and warm starts across four plant scheduling cases"></svg>
+        <figcaption>Median HiGHS solve time. Lower is better; small differences on this shared machine may be timing noise.</figcaption>
+      </figure>
+      <figure class="report-figure">
+        <svg id="highs-integral-chart" class="report-current-chart" role="img" aria-label="Median HiGHS primal-dual integral for cold and warm starts across four plant scheduling cases"></svg>
+        <figcaption>Median primal-dual integral. Lower means a good incumbent was available earlier during the solve; this is not an end-to-end speed measurement.</figcaption>
+      </figure>
+      <p>The warm start lowered the reported primal-dual integral in all four cases. HiGHS solve times were 0.202 → 0.195 s, 0.198 → 0.187 s, 0.607 → 0.505 s, and 3.081 → 3.021 s from 5 to 40 plants. The repaired starting schedules were 1.12%–2.19% above the optimum; HiGHS still reached the optimum in both modes.</p>
+    </section>
+
+    <section class="report-copy">
+      <h2>End-to-end runtime: awaiting matched trials</h2>
+      <p>A fair comparison needs total wall-clock time for the same valid cases, including QAOA or annealing preparation, tuning, sampling, repair, and HiGHS. A QPU run would also include queue and transfer time. The current measurements do not include those components, so they cannot establish an end-to-end speedup.</p>
       <figure class="report-figure">
         <div id="speed-placeholder" class="report-placeholder" aria-label="Empty grouped bar graph template comparing MILP and QAOA–MILP runtime">
           <svg viewBox="0 0 720 360" role="img" aria-labelledby="speed-title speed-desc">
@@ -212,14 +223,14 @@
           </svg>
         </div>
         <img id="speed-chart" alt="Measured grouped bars comparing MILP and QAOA–MILP total runtime by case" hidden>
-        <figcaption id="speed-status">No benchmark results added yet.</figcaption>
+        <figcaption id="speed-status">No matched end-to-end benchmark results added yet.</figcaption>
       </figure>
-      <p>[Summarize the median speed difference, variability across trials, validity, and schedule cost. State whether the result includes QPU queue time. Do not describe a speedup until the chart contains real measurements.]</p>
+      <p>To populate this comparison, collect repeated cold and complete hybrid timings on identical inputs, validate both final schedules with the same checker and cost model, and record machine, software versions, seeds, shots, and backend. The chart generator accepts those trials in <code>speed_results.csv</code>.</p>
     </section>
 
     <section class="report-copy">
       <h2>Actual QPU results</h2>
-      <p>A QPU measures candidate commitment bitstrings. MILP still runs classically to validate and dispatch them. A job ID and QPU device ID should accompany any claim that the quantum step ran on hardware.</p>
+      <p>No physical-QPU job or measured bitstring counts are recorded for this project. The existing <code>output.csv</code> labels its 24-hour schedule as <code>simulator</code> and has no job ID, so it cannot populate a hardware histogram. A QPU would measure candidate commitment bitstrings; repair and MILP would still run classically.</p>
       <figure class="report-figure">
         <div id="qpu-placeholder" class="report-placeholder" aria-label="Empty histogram template for measured QPU bitstrings">
           <svg viewBox="0 0 720 360" role="img" aria-labelledby="qpu-title qpu-desc">
@@ -235,12 +246,12 @@
         <img id="hardware-report-histogram" alt="Measured bitstring counts from one verified QPU job" hidden>
         <figcaption id="hardware-report-status">No QPU results added yet.</figcaption>
       </figure>
-      <p>[Add QPU device ID, job ID, date, shots, circuit depth, two-qubit gate count, valid-shot share, and a comparison with the ideal or noisy simulator.]</p>
+      <p>To populate this histogram, save the device and job IDs for one verified physical-QPU run, its full bitstring counts and total shots, and the circuit's depth and two-qubit gate count. Then calculate the valid-shot share and compare those counts with an ideal or noisy simulator for the same circuit. The chart generator accepts these counts in <code>hardware_results.csv</code>.</p>
     </section>
 
     <section class="report-copy">
       <h2>What the evidence suggests</h2>
-      <p>[Explain what the measured runtime and solution quality support. Describe the sizes tested, the limits of extrapolating to larger systems, and what hardware or algorithm improvements would be needed.]</p>
+      <p>The local pipeline produced feasible warm starts close to optimal and improved the primal-dual integral, but it has not shown a material total-runtime advantage. All four measured MILPs solved at the root node; a harder case with a real search tree is needed to test whether the start can reduce search. Physical hardware also needs a smaller, shallower circuit and a measured QPU run before any hardware-performance conclusion is possible.</p>
     </section>
   </section>
 </body>
