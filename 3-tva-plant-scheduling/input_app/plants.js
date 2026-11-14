@@ -1,159 +1,8 @@
-const DEFAULT_PLANTS = [
-  {
-    "plant_id": "COAL",
-    "type": "coal steam",
-    "pmin_mw": "140",
-    "pmax_mw": "350",
-    "marginal_cost_per_mwh": "21.69",
-    "no_load_cost_per_h": "546",
-    "startup_cost": "36750",
-    "min_up_h": "24",
-    "min_down_h": "48",
-    "ramp_mw_per_h": "240",
-    "on_at_start": "1",
-    "rts_gen_uid": "123_STEAM_3",
-    "scale": "1.0"
-  },
-  {
-    "plant_id": "GAS_CC",
-    "type": "gas combined cycle",
-    "pmin_mw": "168",
-    "pmax_mw": "350",
-    "marginal_cost_per_mwh": "26.84",
-    "no_load_cost_per_h": "206",
-    "startup_cost": "27650",
-    "min_up_h": "8",
-    "min_down_h": "5",
-    "ramp_mw_per_h": "245",
-    "on_at_start": "0",
-    "rts_gen_uid": "107_CC_1",
-    "scale": "0.986"
-  },
-  {
-    "plant_id": "PEAKER_A",
-    "type": "gas combustion turbine",
-    "pmin_mw": "20",
-    "pmax_mw": "50",
-    "marginal_cost_per_mwh": "28.89",
-    "no_load_cost_per_h": "443",
-    "startup_cost": "5150",
-    "min_up_h": "3",
-    "min_down_h": "3",
-    "ramp_mw_per_h": "202",
-    "on_at_start": "0",
-    "rts_gen_uid": "113_CT_1",
-    "scale": "0.909"
-  },
-  {
-    "plant_id": "PEAKER_B",
-    "type": "gas combustion turbine (older)",
-    "pmin_mw": "20",
-    "pmax_mw": "50",
-    "marginal_cost_per_mwh": "39.51",
-    "no_load_cost_per_h": "749",
-    "startup_cost": "5150",
-    "min_up_h": "3",
-    "min_down_h": "3",
-    "ramp_mw_per_h": "202",
-    "on_at_start": "0",
-    "rts_gen_uid": "223_CT_4",
-    "scale": "0.909"
-  },
-  {
-    "plant_id": "OIL",
-    "type": "oil combustion turbine",
-    "pmin_mw": "20",
-    "pmax_mw": "50",
-    "marginal_cost_per_mwh": "101.02",
-    "no_load_cost_per_h": "694",
-    "startup_cost": "130",
-    "min_up_h": "1",
-    "min_down_h": "1",
-    "ramp_mw_per_h": "450",
-    "on_at_start": "0",
-    "rts_gen_uid": "101_CT_1",
-    "scale": "2.5"
-  },
-  {
-    "plant_id": "COAL_MID",
-    "type": "coal steam (mid size)",
-    "pmin_mw": "60",
-    "pmax_mw": "150",
-    "marginal_cost_per_mwh": "21.68",
-    "no_load_cost_per_h": "378",
-    "startup_cost": "22050",
-    "min_up_h": "8",
-    "min_down_h": "8",
-    "ramp_mw_per_h": "174",
-    "on_at_start": "1",
-    "rts_gen_uid": "116_STEAM_1",
-    "scale": "0.968"
-  },
-  {
-    "plant_id": "COAL_SMALL",
-    "type": "coal steam (small)",
-    "pmin_mw": "39",
-    "pmax_mw": "100",
-    "marginal_cost_per_mwh": "23.8",
-    "no_load_cost_per_h": "145",
-    "startup_cost": "14700",
-    "min_up_h": "8",
-    "min_down_h": "4",
-    "ramp_mw_per_h": "158",
-    "on_at_start": "0",
-    "rts_gen_uid": "201_STEAM_3",
-    "scale": "1.316"
-  },
-  {
-    "plant_id": "GAS_CC_2",
-    "type": "gas combined cycle",
-    "pmin_mw": "144",
-    "pmax_mw": "300",
-    "marginal_cost_per_mwh": "28.59",
-    "no_load_cost_per_h": "262",
-    "startup_cost": "23700",
-    "min_up_h": "8",
-    "min_down_h": "5",
-    "ramp_mw_per_h": "210",
-    "on_at_start": "0",
-    "rts_gen_uid": "213_CC_3",
-    "scale": "0.845"
-  },
-  {
-    "plant_id": "PEAKER_C",
-    "type": "gas combustion turbine",
-    "pmin_mw": "20",
-    "pmax_mw": "50",
-    "marginal_cost_per_mwh": "25.91",
-    "no_load_cost_per_h": "420",
-    "startup_cost": "5150",
-    "min_up_h": "3",
-    "min_down_h": "3",
-    "ramp_mw_per_h": "202",
-    "on_at_start": "0",
-    "rts_gen_uid": "322_CT_5",
-    "scale": "0.909"
-  },
-  {
-    "plant_id": "OIL_2",
-    "type": "oil combustion turbine",
-    "pmin_mw": "20",
-    "pmax_mw": "50",
-    "marginal_cost_per_mwh": "101.02",
-    "no_load_cost_per_h": "694",
-    "startup_cost": "130",
-    "min_up_h": "1",
-    "min_down_h": "1",
-    "ramp_mw_per_h": "450",
-    "on_at_start": "0",
-    "rts_gen_uid": "101_CT_2",
-    "scale": "2.5"
-  }
-];
-
 const form = document.querySelector("#plants-form");
 const cards = document.querySelector("#plant-cards");
 const status = document.querySelector("#plants-status");
+const csvInput = document.querySelector("#plant-csv-file");
+const dropZone = document.querySelector("#plant-csv-drop-zone");
 
 // To expose another plants.csv column, add its label and input type here,
 // then add validation for it in server.py.
@@ -172,6 +21,59 @@ const FIELDS = [
   { key: "rts_gen_uid", label: "RTS generator ID (optional)", type: "text" },
   { key: "scale", label: "Scale", type: "number", min: 0, step: "any" },
 ];
+
+// Snapshot of ../data/plants10.csv. Keep this independent of the editable plants.csv.
+const DEFAULT_PLANTS_CSV = `plant_id,type,pmin_mw,pmax_mw,marginal_cost_per_mwh,no_load_cost_per_h,startup_cost,min_up_h,min_down_h,ramp_mw_per_h,on_at_start,rts_gen_uid,scale
+COAL,coal steam,140,350,21.69,546,36750,24,48,240,1,123_STEAM_3,1.0
+GAS_CC,gas combined cycle,168,350,26.84,206,27650,8,5,245,0,107_CC_1,0.986
+PEAKER_A,gas combustion turbine,20,50,28.89,443,5150,3,3,202,0,113_CT_1,0.909
+PEAKER_B,gas combustion turbine (older),20,50,39.51,749,5150,3,3,202,0,223_CT_4,0.909
+OIL,oil combustion turbine,20,50,101.02,694,130,1,1,450,0,101_CT_1,2.5
+COAL_MID,coal steam (mid size),60,150,21.68,378,22050,8,8,174,1,116_STEAM_1,0.968
+COAL_SMALL,coal steam (small),39,100,23.8,145,14700,8,4,158,0,201_STEAM_3,1.316
+GAS_CC_2,gas combined cycle,144,300,28.59,262,23700,8,5,210,0,213_CC_3,0.845
+PEAKER_C,gas combustion turbine,20,50,25.91,420,5150,3,3,202,0,322_CT_5,0.909
+OIL_2,oil combustion turbine,20,50,101.02,694,130,1,1,450,0,101_CT_2,2.5`;
+
+function parsePlantCsv(text) {
+  const records = [];
+  let record = [];
+  let value = "";
+  let quoted = false;
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    if (char === '"') {
+      if (quoted && text[i + 1] === '"') { value += '"'; i++; }
+      else if (quoted || value === "") quoted = !quoted;
+      else throw new Error("Invalid CSV quote");
+    } else if (char === "," && !quoted) {
+      record.push(value);
+      value = "";
+    } else if ((char === "\n" || char === "\r") && !quoted) {
+      if (char === "\r" && text[i + 1] === "\n") i++;
+      record.push(value);
+      if (record.some((cell) => cell !== "")) records.push(record);
+      record = [];
+      value = "";
+    } else {
+      value += char;
+    }
+  }
+  if (quoted) throw new Error("Unclosed CSV quote");
+  record.push(value);
+  if (record.some((cell) => cell !== "")) records.push(record);
+  const header = records.shift();
+  const columns = FIELDS.map((field) => field.key);
+  if (!header || header.length !== columns.length ||
+      new Set(header).size !== columns.length ||
+      !columns.every((column) => header.includes(column))) {
+    throw new Error("CSV columns must match plants.csv");
+  }
+  if (!records.length || records.some((row) => row.length !== header.length)) {
+    throw new Error("CSV needs complete plant rows");
+  }
+  return records.map((row) => Object.fromEntries(header.map((key, index) => [key, row[index]])));
+}
 
 function addCard(row = {}, isNew = false) {
   const card = document.createElement("article");
@@ -226,7 +128,7 @@ function addCard(row = {}, isNew = false) {
   if (isNew) card.querySelector('[data-field="plant_id"]').focus();
 }
 
-function showPlants(rows) {
+function renderPlants(rows) {
   cards.replaceChildren();
   for (const row of rows) addCard(row);
 }
@@ -234,105 +136,20 @@ function showPlants(rows) {
 async function loadPlants() {
   const response = await fetch("api/plants");
   if (!response.ok) throw new Error("Could not load plants.csv");
-  showPlants(await response.json());
-}
-
-function parsePlantCsv(text) {
-  const rows = [];
-  let row = [];
-  let value = "";
-  let quoted = false;
-  text = text.replace(/^\uFEFF/, "");
-
-  for (let i = 0; i < text.length; i++) {
-    const character = text[i];
-    if (quoted) {
-      if (character === '"' && text[i + 1] === '"') {
-        value += '"';
-        i++;
-      } else if (character === '"') {
-        quoted = false;
-      } else {
-        value += character;
-      }
-    } else if (character === '"' && value === "") {
-      quoted = true;
-    } else if (character === '"') {
-      throw new Error("Invalid quote in CSV file.");
-    } else if (character === ",") {
-      row.push(value);
-      value = "";
-    } else if (character === "\n" || character === "\r") {
-      row.push(value);
-      if (row.some((cell) => cell.trim() !== "")) rows.push(row);
-      row = [];
-      value = "";
-      if (character === "\r" && text[i + 1] === "\n") i++;
-    } else {
-      value += character;
-    }
-  }
-  if (quoted) throw new Error("Unclosed quote in CSV file.");
-  row.push(value);
-  if (row.some((cell) => cell.trim() !== "")) rows.push(row);
-
-  const headers = rows.shift()?.map((cell) => cell.trim());
-  const required = FIELDS.map((field) => field.key);
-  if (!headers || headers.length !== required.length ||
-      new Set(headers).size !== required.length ||
-      !required.every((key) => headers.includes(key))) {
-    throw new Error("CSV columns must match plants.csv (the order may differ).");
-  }
-  if (!rows.length) throw new Error("The CSV file has no plants.");
-
-  const plantIds = new Set();
-  return rows.map((cells, index) => {
-    const line = index + 2;
-    if (cells.length !== headers.length) {
-      throw new Error(`Row ${line} has ${cells.length} columns; expected ${headers.length}.`);
-    }
-    const plant = Object.fromEntries(headers.map((key, i) => [key, cells[i].trim()]));
-    if (!plant.plant_id || !plant.type) {
-      throw new Error(`Row ${line} needs a plant ID and type.`);
-    }
-    if (plantIds.has(plant.plant_id)) {
-      throw new Error(`Repeated plant ID: ${plant.plant_id}.`);
-    }
-    plantIds.add(plant.plant_id);
-    for (const field of FIELDS.filter((item) => item.type === "number" || item.type === "select")) {
-      const raw = plant[field.key];
-      const number = Number(raw);
-      if (raw === "" || !Number.isFinite(number) || number < 0 ||
-          (["min_up_h", "min_down_h", "on_at_start"].includes(field.key) && !Number.isInteger(number))) {
-        throw new Error(`Row ${line}: invalid ${field.key}.`);
-      }
-    }
-    if (Number(plant.pmax_mw) <= 0 || Number(plant.pmin_mw) > Number(plant.pmax_mw) ||
-        Number(plant.scale) <= 0 || !["0", "1"].includes(plant.on_at_start)) {
-      throw new Error(`Row ${line}: invalid output range, scale, or starting state.`);
-    }
-    return plant;
-  });
+  renderPlants(await response.json());
 }
 
 document.querySelector("#load-default-plants").addEventListener("click", () => {
-  showPlants(DEFAULT_PLANTS);
-  status.textContent = "Loaded 10 default plants. Review them, then save.";
+  renderPlants(parsePlantCsv(DEFAULT_PLANTS_CSV));
+  status.textContent = "Loaded 10 default plants. Click Save plants.csv to keep them.";
 });
-
-const csvInput = document.querySelector("#plant-csv-file");
-const dropZone = document.querySelector("#plant-csv-drop-zone");
 
 async function importPlantFile(file) {
   if (!file) return;
-  if (!file.name.toLowerCase().endsWith(".csv")) {
-    status.textContent = "Choose a .csv file.";
-    return;
-  }
   try {
     const rows = parsePlantCsv(await file.text());
-    showPlants(rows);
-    status.textContent = `Loaded ${rows.length} plants from ${file.name}. Review them, then save.`;
+    renderPlants(rows);
+    status.textContent = `Loaded ${rows.length} plants from ${file.name}. Click Save plants.csv to keep them.`;
   } catch (error) {
     status.textContent = `Import failed: ${error.message}`;
   }
@@ -342,12 +159,10 @@ csvInput.addEventListener("change", () => {
   importPlantFile(csvInput.files[0]);
   csvInput.value = "";
 });
-for (const eventName of ["dragenter", "dragover"]) {
-  dropZone.addEventListener(eventName, (event) => {
-    event.preventDefault();
-    dropZone.classList.add("drag-over");
-  });
-}
+dropZone.addEventListener("dragover", (event) => {
+  event.preventDefault();
+  dropZone.classList.add("drag-over");
+});
 dropZone.addEventListener("dragleave", () => dropZone.classList.remove("drag-over"));
 dropZone.addEventListener("drop", (event) => {
   event.preventDefault();

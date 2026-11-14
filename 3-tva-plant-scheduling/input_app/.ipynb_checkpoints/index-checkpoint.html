@@ -3,37 +3,83 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Hourly demand editor</title>
-  <style>
-    body { font: 16px system-ui, sans-serif; max-width: 760px; margin: 2rem auto; padding: 0 1rem; color: #182230; }
-    h1 { margin-bottom: .25rem; }
-    p { line-height: 1.5; }
-    table { border-collapse: collapse; width: 100%; }
-    th, td { border-bottom: 1px solid #ccd3db; padding: .45rem; text-align: left; }
-    th { background: #edf2f7; }
-    input { font: inherit; width: 8rem; padding: .3rem; }
-    button { font: inherit; padding: .55rem 1rem; margin-top: 1rem; cursor: pointer; }
-    #status { min-height: 1.5rem; }
-    @media (prefers-color-scheme: dark) {
-      body { color: #e5ebf2; background: #15202d; }
-      th { background: #253548; }
-      td, th { border-color: #49586b; }
-    }
-  </style>
-  <script src="app.js" defer></script>
+  <title>Plant scheduling editor</title>
+  <link rel="stylesheet" href="styles.css">
+  <!-- Navigation reads the #plants/#demand fragment; keep these IDs in sync with navigation.js. -->
+  <script src="navigation.js" defer></script>
+  <!-- Modules isolate each page script: both use local names such as form and status. -->
+  <script type="module" src="app.js"></script>
+  <script type="module" src="plants.js"></script>
 </head>
 <body>
-  <h1>Hourly demand</h1>
-  <p>Enter demand in MW for any hour, then save. Reserve is calculated as 10% of demand.</p>
-  <form id="demand-form">
-    <table>
-      <thead><tr><th>Hour</th><th>Demand (MW)</th><th>Reserve (MW)</th></tr></thead>
-      <tbody id="hours"></tbody>
-    </table>
-    <button type="submit">Save CSV</button>
-  </form>
-  <p id="status" role="status" aria-live="polite"></p>
-  <p>Files: <a href="demand.csv" download>download demand.csv</a> ·
-    <a href="plants.csv" download>download plants.csv</a></p>
+  <!-- These links change the URL fragment, so Canvas keeps one preview frame open. -->
+  <nav aria-label="Pages">
+    <a href="#plants" data-page-link="plants">Power plants</a>
+    <a href="#demand" data-page-link="demand">Demand and reserve</a>
+  </nav>
+
+  <!-- The plant editor is filled by plants.js. Its IDs are queried there. -->
+  <section id="plants-page" hidden>
+    <h1>Power plants</h1>
+    <p>Choose how to build your plant list. Review the rows below, then save them to plants.csv.</p>
+    <!-- Both choices replace the rows shown below; only Save writes plants.csv. -->
+    <div class="plant-options">
+      <div class="plant-option">
+        <h2>Manually edit 10 default plants</h2>
+        <p>Start with the 10 example plants and change their values below.</p>
+        <button type="button" id="load-default-plants">Use 10 default plants</button>
+      </div>
+      <div class="plant-option">
+        <h2>Add your own plants via CSV</h2>
+        <p>Import a plants CSV to add your own list of power plants (Make sure it's in the same format as the default).</p>
+        <!-- Keep the input inside the label: clicking anywhere in the drop zone opens the picker. -->
+        <label class="csv-drop-zone" id="plant-csv-drop-zone">
+          <input type="file" id="plant-csv-file" accept=".csv,text/csv">
+          <span>Drop a .csv file here, or</span>
+          <span class="file-button">Add power plant .csv</span>
+        </label>
+      </div>
+    </div>
+    <!-- plants.js builds one card per CSV row inside plant-cards. -->
+    <form id="plants-form">
+      <div class="actions">
+        <button type="submit">Save plants.csv</button>
+        <a href="plants.csv" download>Download plants.csv</a>
+      </div>
+      <p id="plants-status" role="status" aria-live="polite"></p>
+      <div id="plant-cards"></div>
+    </form>
+  </section>
+
+  <!-- The demand editor and SVG chart are filled by app.js. -->
+  <section id="demand-page">
+    <h1>Demand and reserve</h1>
+    <p>The solid line shows demand. The dotted line shows demand plus reserve: the capacity needed each hour. Edit demand below; use the reserve slider to set every hour at once.</p>
+    <!-- Reserve is a percentage of each hour's demand; app.js rounds to whole MW. -->
+    <div class="reserve-control">
+      <label for="reserve-percent">Reserve for every hour: <output id="reserve-percent-value" for="reserve-percent">10%</output></label>
+      <input type="range" id="reserve-percent" min="0" max="100" step="1" value="10">
+      <span>0%</span><span>100%</span>
+    </div>
+    <!-- Chart coordinates and series are defined in app.js; colors live in styles.css. -->
+    <div class="chart-frame">
+      <svg id="demand-chart" viewBox="0 0 760 300" role="img" aria-label="Hourly demand and demand plus reserve chart"></svg>
+      <div class="legend"><span>Demand</span><span class="reserve">Demand + reserve</span></div>
+    </div>
+    <form id="demand-form">
+      <div class="actions">
+        <button type="submit">Save demand.csv</button>
+
+        <a href="demand.csv" download>Download demand.csv</a>
+      </div>
+      <p id="demand-status" role="status" aria-live="polite"></p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Hour</th><th>Demand (MW)</th><th>Reserve (MW, from slider)</th><th>Required capacity (MW)</th></tr></thead>
+          <tbody id="hours"></tbody>
+        </table>
+      </div>
+    </form>
+  </section>
 </body>
 </html>

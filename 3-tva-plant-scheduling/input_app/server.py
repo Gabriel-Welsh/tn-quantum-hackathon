@@ -14,6 +14,7 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 
+# Store edited CSVs beside this server, independent of the launch working directory.
 FOLDER = Path(__file__).resolve().parent
 DEMAND_CSV = FOLDER / "demand.csv"
 PLANTS_CSV = FOLDER / "plants.csv"
@@ -28,13 +29,14 @@ PLANT_INTEGERS = {"min_up_h", "min_down_h", "on_at_start"}
 
 
 def read_csv(path):
+    """Return the CSV header and rows as strings; the browser/API convert values."""
     with path.open(newline="") as file:
         reader = csv.DictReader(file)
         return reader.fieldnames, list(reader)
 
 
 def write_csv(path, columns, rows):
-    """Replace the CSV only after a complete new copy has been written."""
+    """Write in the same folder, then atomically replace the old CSV."""
     with tempfile.NamedTemporaryFile("w", newline="", dir=FOLDER, delete=False) as file:
         temp_path = Path(file.name)
         writer = csv.DictWriter(file, fieldnames=columns)
@@ -47,6 +49,7 @@ def write_csv(path, columns, rows):
 
 
 def nonnegative_number(value, name, integer=False):
+    """Reject negative, non-finite, and wrong JSON types before writing a CSV."""
     if integer:
         if type(value) is not int or value < 0:
             raise ValueError(f"{name} must be a nonnegative whole number")
@@ -56,9 +59,11 @@ def nonnegative_number(value, name, integer=False):
 
 
 def save_demand(submitted):
+    """Update every existing hour while preserving its order and extra columns."""
     columns, rows = read_csv(DEMAND_CSV)
     if not isinstance(submitted, list) or len(submitted) != len(rows):
         raise ValueError("Submit one value for every hour")
+    # Keep the original CSV order even if the browser submits hours out of order.
     existing = {int(row["hour"]): row for row in rows}
     seen = set()
     for item in submitted:
@@ -79,12 +84,14 @@ def save_demand(submitted):
 
 
 def save_plants(submitted):
+    """Validate the complete plant list before replacing input_app/plants.csv."""
     columns, previous = read_csv(PLANTS_CSV)
     required = {"plant_id", "type", "rts_gen_uid", *PLANT_NUMBERS}
     if not required.issubset(columns):
         raise ValueError("plants.csv is missing a required column")
     if not isinstance(submitted, list) or not submitted:
         raise ValueError("Submit at least one power plant")
+    # Preserve any uneditable extra columns for plant IDs already in the file.
     old_by_id = {row["plant_id"]: row for row in previous}
     seen = set()
     rows = []
@@ -125,12 +132,14 @@ def save_plants(submitted):
     write_csv(PLANTS_CSV, columns, rows)
 
 
+# Small local-only HTTP server. New pages/assets need a GET route below; writes need a POST route.
 class Handler(BaseHTTPRequestHandler):
     def log_request(self, code="-", size="-"):
         # Do not print qBraid URL query strings, which can contain a token.
         self.log_message("%s %s -> %s", self.command, urlsplit(self.path).path, code)
 
     def respond(self, code, content, content_type="text/plain; charset=utf-8"):
+        """Send one complete response with the right byte length and MIME type."""
         body = content if isinstance(content, bytes) else content.encode("utf-8")
         self.send_response(code)
         self.send_header("Content-Type", content_type)
@@ -141,6 +150,7 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         # qBraid may append a query string. Route using just the path.
         path = urlsplit(self.path).path
+        # These API routes read the saved CSVs; browser import needs no upload endpoint.
         if path in ("/api/demand", "/api/plants"):
             csv_path = DEMAND_CSV if path == "/api/demand" else PLANTS_CSV
             _, rows = read_csv(csv_path)
@@ -164,12 +174,14 @@ class Handler(BaseHTTPRequestHandler):
         self.respond(200, (FOLDER / name).read_bytes(), content_type)
 
     def do_POST(self):
+        """Accept JSON from the editors and report validation errors as HTTP 400."""
         path = urlsplit(self.path).path
         if path not in ("/api/demand", "/api/plants"):
             self.respond(404, "Not found")
             return
         try:
             length = int(self.headers.get("Content-Length", "0"))
+            # Bound request size because this is a simple synchronous local server.
             if not 0 < length <= 100_000:
                 raise ValueError("Invalid request size")
             submitted = json.loads(self.rfile.read(length))
@@ -182,6 +194,7 @@ class Handler(BaseHTTPRequestHandler):
             self.respond(400, str(error))
 
 
+# Bind to loopback; qBraid Lab exposes it through /proxy/8000 and Agent Canvas.
 if __name__ == "__main__":
     server = HTTPServer(("127.0.0.1", PORT), Handler)
     print(f"Open the Lab URL's /proxy/{PORT}/ path (or http://127.0.0.1:{PORT}/ locally). Ctrl+C to stop.")

@@ -5,19 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Plant scheduling editor</title>
   <link rel="stylesheet" href="styles.css">
+  <!-- Navigation reads the #plants/#demand fragment; keep these IDs in sync with navigation.js. -->
   <script src="navigation.js" defer></script>
-  <script src="app.js" defer></script>
-  <script src="plants.js" defer></script>
+  <!-- Modules isolate each page script: both use local names such as form and status. -->
+  <script type="module" src="app.js"></script>
+  <script type="module" src="plants.js"></script>
 </head>
 <body>
+  <!-- These links change the URL fragment, so Canvas keeps one preview frame open. -->
   <nav aria-label="Pages">
     <a href="#plants" data-page-link="plants">Power plants</a>
     <a href="#demand" data-page-link="demand">Demand and reserve</a>
   </nav>
 
+  <!-- The plant editor is filled by plants.js. Its IDs are queried there. -->
   <section id="plants-page" hidden>
     <h1>Power plants</h1>
     <p>Choose how to build your plant list. Review the rows below, then save them to plants.csv.</p>
+    <!-- Both choices replace the rows shown below; only Save writes plants.csv. -->
     <div class="plant-options">
       <div class="plant-option">
         <h2>Manually edit 10 default plants</h2>
@@ -26,7 +31,8 @@
       </div>
       <div class="plant-option">
         <h2>Add your own plants via CSV</h2>
-        <p>Import a CSV with the same columns as plants.csv. Its rows replace the plants currently shown below.</p>
+        <p>Import a plants CSV to add your own list of power plants (Make sure it's in the same format as the default).</p>
+        <!-- Keep the input inside the label: clicking anywhere in the drop zone opens the picker. -->
         <label class="csv-drop-zone" id="plant-csv-drop-zone">
           <input type="file" id="plant-csv-file" accept=".csv,text/csv">
           <span>Drop a .csv file here, or</span>
@@ -34,6 +40,7 @@
         </label>
       </div>
     </div>
+    <!-- plants.js builds one card per CSV row inside plant-cards. -->
     <form id="plants-form">
       <div class="actions">
         <button type="submit">Save plants.csv</button>
@@ -44,9 +51,17 @@
     </form>
   </section>
 
+  <!-- The demand editor and SVG chart are filled by app.js. -->
   <section id="demand-page">
     <h1>Demand and reserve</h1>
-    <p>The solid line shows demand. The dotted line shows demand plus reserve: the capacity needed each hour. Edit either column below and the chart updates before you save.</p>
+    <p>The solid line shows demand. The dotted line shows demand plus reserve: the capacity needed each hour. Edit demand below; use the reserve slider to set every hour at once.</p>
+    <!-- Reserve is a percentage of each hour's demand; app.js rounds to whole MW. -->
+    <div class="reserve-control">
+      <label for="reserve-percent">Reserve for every hour: <output id="reserve-percent-value" for="reserve-percent">10%</output></label>
+      <input type="range" id="reserve-percent" min="0" max="100" step="1" value="10">
+      <span>0%</span><span>100%</span>
+    </div>
+    <!-- Chart coordinates and series are defined in app.js; colors live in styles.css. -->
     <div class="chart-frame">
       <svg id="demand-chart" viewBox="0 0 760 300" role="img" aria-label="Hourly demand and demand plus reserve chart"></svg>
       <div class="legend"><span>Demand</span><span class="reserve">Demand + reserve</span></div>
@@ -54,13 +69,13 @@
     <form id="demand-form">
       <div class="actions">
         <button type="submit">Save demand.csv</button>
-        <button type="button" id="reserve-ten">Set all reserves to 10% of demand</button>
+
         <a href="demand.csv" download>Download demand.csv</a>
       </div>
       <p id="demand-status" role="status" aria-live="polite"></p>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Hour</th><th>Demand (MW)</th><th>Reserve (MW)</th><th>Required capacity (MW)</th></tr></thead>
+          <thead><tr><th>Hour</th><th>Demand (MW)</th><th>Reserve (MW, from slider)</th><th>Required capacity (MW)</th></tr></thead>
           <tbody id="hours"></tbody>
         </table>
       </div>
