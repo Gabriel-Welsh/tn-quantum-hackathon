@@ -1,9 +1,14 @@
+// Demand editor: index.html owns the markup, server.py owns CSV reads and writes.
+// Keep these selectors in sync with the IDs in index.html.
 const form = document.querySelector("#demand-form");
 const hoursBody = document.querySelector("#hours");
 const chart = document.querySelector("#demand-chart");
 const status = document.querySelector("#demand-status");
+const reserveSlider = document.querySelector("#reserve-percent");
+const reserveOutput = document.querySelector("#reserve-percent-value");
 const SVG_NS = "http://www.w3.org/2000/svg";
 
+// Create one SVG child using DOM APIs, then append it to the chart.
 function svgElement(tag, attributes, text) {
   const element = document.createElementNS(SVG_NS, tag);
   for (const [name, value] of Object.entries(attributes)) element.setAttribute(name, value);
@@ -12,19 +17,22 @@ function svgElement(tag, attributes, text) {
   return element;
 }
 
+// One slider controls reserve in every row; round each hour to a whole MW.
+function reserveFor(demand) {
+  return Math.round(demand * Number(reserveSlider.value) / 100);
+}
+
+// Read editable demand and calculate reserve. null marks an invalid row for chart and Save.
 function getRows() {
   return [...hoursBody.querySelectorAll("tr")].map((tr) => {
     const demandInput = tr.querySelector('[data-field="demand_mw"]');
-    const reserveInput = tr.querySelector('[data-field="reserve_mw"]');
     const demand = Number(demandInput.value);
-    const reserve = Number(reserveInput.value);
-    if (!demandInput.value || !reserveInput.value ||
-        !Number.isInteger(demand) || !Number.isInteger(reserve) ||
-        demand < 0 || reserve < 0) return null;
-    return { hour: Number(tr.dataset.hour), demand_mw: demand, reserve_mw: reserve };
+    if (!demandInput.value || !Number.isInteger(demand) || demand < 0) return null;
+    return { hour: Number(tr.dataset.hour), demand_mw: demand, reserve_mw: reserveFor(demand) };
   });
 }
 
+// Rebuild the chart from the current table; no chart library or separate state is used.
 function drawChart() {
   const rows = getRows();
   chart.replaceChildren();
@@ -32,8 +40,10 @@ function drawChart() {
     svgElement("text", { x: 40, y: 150, class: "axis-label" }, "Enter valid demand and reserve values to see the chart.");
     return;
   }
+  // These margins and the SVG viewBox in index.html set the plotting area.
   const width = 760, height = 300, left = 55, right = 20, top = 18, bottom = 36;
   const plotWidth = width - left - right, plotHeight = height - top - bottom;
+  // Size the Y axis to the largest demand + reserve value, rounded to 100 MW.
   const maximum = Math.max(1, ...rows.map((row) => row.demand_mw + row.reserve_mw));
   const yMaximum = Math.max(100, Math.ceil(maximum / 100) * 100);
   const x = (index) => left + index * plotWidth / Math.max(1, rows.length - 1);
@@ -50,25 +60,34 @@ function drawChart() {
       svgElement("text", { x: x(index), y: height - 8, "text-anchor": "middle", class: "axis-label" }, row.hour);
     }
   });
+  // Each series is an SVG path; add or remove series here and in the legend.
   const pathFor = (value) => rows.map((row, index) =>
     (index === 0 ? "M" : "L") + x(index) + " " + y(value(row))).join(" ");
   svgElement("path", { d: pathFor((row) => row.demand_mw), class: "demand-line" });
   svgElement("path", { d: pathFor((row) => row.demand_mw + row.reserve_mw), class: "reserve-line" });
 }
 
-function updateRequired(tr) {
-  const demand = Number(tr.querySelector('[data-field="demand_mw"]').value);
-  const reserve = Number(tr.querySelector('[data-field="reserve_mw"]').value);
-  tr.querySelector(".required-capacity").textContent =
-    Number.isInteger(demand) && Number.isInteger(reserve) && demand >= 0 && reserve >= 0
-      ? demand + reserve : "—";
-  drawChart();
+// Show the slider-derived reserve and required capacity for one hour.
+function updateRequired(tr, redraw = true) {
+  const demandInput = tr.querySelector('[data-field="demand_mw"]');
+  const demand = Number(demandInput.value);
+  const valid = demandInput.value !== "" && Number.isInteger(demand) && demand >= 0;
+  tr.querySelector(".reserve-mw").textContent = valid ? reserveFor(demand) : "—";
+  tr.querySelector(".required-capacity").textContent = valid ? demand + reserveFor(demand) : "—";
+  if (redraw) drawChart();
 }
 
+// The API returns CSV rows as strings; number inputs and getRows convert them for editing.
 async function loadDemand() {
   const response = await fetch("api/demand");
   if (!response.ok) throw new Error("Could not load demand.csv");
   const rows = await response.json();
+  // Initialize the slider from the saved fleet's overall reserve ratio.
+  const totalDemand = rows.reduce((sum, row) => sum + Number(row.demand_mw), 0);
+  const totalReserve = rows.reduce((sum, row) => sum + Number(row.reserve_mw), 0);
+  reserveSlider.value = totalDemand > 0
+    ? Math.max(0, Math.min(100, Math.round(totalReserve / totalDemand * 100))) : 10;
+  reserveOutput.value = `${reserveSlider.value}%`;
   hoursBody.replaceChildren();
   for (const row of rows) {
     const tr = document.createElement("tr");
@@ -76,43 +95,44 @@ async function loadDemand() {
     const hour = document.createElement("td");
     hour.textContent = row.hour;
     tr.append(hour);
-    for (const field of ["demand_mw", "reserve_mw"]) {
-      const cell = document.createElement("td");
-      const input = document.createElement("input");
-      input.type = "number";
-      input.min = "0";
-      input.step = "1";
-      input.required = true;
-      input.value = row[field];
-      input.dataset.field = field;
-      input.setAttribute("aria-label", `${field === "demand_mw" ? "Demand" : "Reserve"} for hour ${row.hour} in MW`);
-      input.addEventListener("input", () => updateRequired(tr));
-      cell.append(input);
-      tr.append(cell);
-    }
+    const demandCell = document.createElement("td");
+    const input = document.createElement("input");
+    input.type = "number";
+    input.min = "0";
+    input.step = "1";
+    input.required = true;
+    input.value = row.demand_mw;
+    input.dataset.field = "demand_mw";
+    input.setAttribute("aria-label", `Demand for hour ${row.hour} in MW`);
+    input.addEventListener("input", () => updateRequired(tr));
+    demandCell.append(input);
+    tr.append(demandCell);
+    const reserve = document.createElement("td");
+    reserve.className = "reserve-mw";
+    tr.append(reserve);
     const required = document.createElement("td");
     required.className = "required-capacity";
     tr.append(required);
     hoursBody.append(tr);
-    updateRequired(tr);
+    updateRequired(tr, false);
   }
   drawChart();
 }
 
-document.querySelector("#reserve-ten").addEventListener("click", () => {
-  for (const tr of hoursBody.querySelectorAll("tr")) {
-    const demand = Number(tr.querySelector('[data-field="demand_mw"]').value);
-    tr.querySelector('[data-field="reserve_mw"]').value = Math.round(demand * 0.1);
-    updateRequired(tr);
-  }
+// Apply the selected percentage to every hour in the table and chart at once.
+reserveSlider.addEventListener("input", () => {
+  reserveOutput.value = `${reserveSlider.value}%`;
+  for (const tr of hoursBody.querySelectorAll("tr")) updateRequired(tr, false);
+  drawChart();
   status.textContent = "Reserve values changed. Click Save demand.csv to keep them.";
 });
 
+// Save sends every hour to server.py, where the complete set is checked before replacing demand.csv.
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
   const rows = getRows();
   if (rows.some((row) => row === null)) {
-    status.textContent = "Enter nonnegative whole numbers for demand and reserve.";
+    status.textContent = "Enter nonnegative whole numbers for demand.";
     return;
   }
   // Add new hourly fields to getRows(), then validate/save them in server.py.
@@ -131,4 +151,5 @@ form.addEventListener("submit", async (event) => {
   }
 });
 
+// Load saved values on page open; errors are shown in the status area instead of the console.
 loadDemand().catch((error) => { status.textContent = error.message; });
