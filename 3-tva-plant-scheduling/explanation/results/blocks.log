@@ -1,0 +1,52 @@
+
+=== blocks ===
+block n= 3 K=2 qaoa   qubits=  1 raw   +3.30% (1 broken) -> polished   +2.07% (0 broken)
+block n= 3 K=3 qaoa   qubits=  2 raw   +3.30% (1 broken) -> polished   +2.07% (0 broken)
+block n= 3 K=4 qaoa   qubits=  3 raw   +0.40% (1 broken) -> polished   +0.00% (0 broken)
+block n= 3 K=6 qaoa   qubits= 11 raw   +1.87% (0 broken) -> polished   +1.87% (0 broken)
+day   n= 3 full 24h  qubits= 279 raw   +0.00% (0 broken) -> polished   +0.00%
+saved /home/jovyan/tn-quantum-hackathon/3-tva-plant-scheduling/explanation/results/blocks.json
+warning: block 1 (hours 7-23) can't meet its requirement even with every plant on.
+warning: block 1 (hours 7-23) can't meet its requirement even with every plant on.
+block n= 4 K=2 qaoa   qubits=  3 raw   +0.52% (3 broken) -> polished   +0.91% (0 broken)
+block n= 4 K=3 qaoa   qubits=  6 raw   +2.38% (0 broken) -> polished   +0.91% (0 broken)
+block n= 4 K=4 qaoa   qubits=  7 raw   +0.63% (0 broken) -> polished   -0.00% (0 broken)
+block n= 4 K=6 anneal qubits= 18 raw   +0.63% (0 broken) -> polished   -0.00% (0 broken)
+day   n= 4 full 24h  qubits= 350 raw   +0.00% (0 broken) -> polished   +0.00%
+saved /home/jovyan/tn-quantum-hackathon/3-tva-plant-scheduling/explanation/results/blocks.json
+block n= 5 K=2 qaoa   qubits=  8 raw  +10.78% (1 broken) -> polished   +3.91% (0 broken)
+block n= 5 K=3 qaoa   qubits= 11 raw   +7.74% (0 broken) -> polished   +3.91% (0 broken)
+block n= 5 K=4 qaoa   qubits= 15 raw   +6.90% (0 broken) -> polished   +3.53% (0 broken)
+block n= 5 K=6 anneal qubits= 30 raw   +4.39% (0 broken) -> polished   +1.97% (0 broken)
+day   n= 5 full 24h  qubits= 377 raw   +0.00% (0 broken) -> polished   +0.00%
+saved /home/jovyan/tn-quantum-hackathon/3-tva-plant-scheduling/explanation/results/blocks.json
+block n= 6 K=2 qaoa   qubits=  7 raw   +7.39% (1 broken) -> polished   +0.98% (0 broken)
+block n= 6 K=3 qaoa   qubits= 13 raw   +4.68% (0 broken) -> polished   +0.98% (0 broken)
+block n= 6 K=4 anneal qubits= 24 raw   +3.16% (0 broken) -> polished   +0.98% (0 broken)
+block n= 6 K=6 anneal qubits= 46 raw   +2.96% (0 broken) -> polished   +0.98% (0 broken)
+day   n= 6 full 24h  qubits= 449 raw   +1.03% (0 broken) -> polished   +0.98%
+saved /home/jovyan/tn-quantum-hackathon/3-tva-plant-scheduling/explanation/results/blocks.json
+block n= 7 K=2 qaoa   qubits= 12 raw   +2.77% (0 broken) -> polished   -0.00% (0 broken)
+block n= 7 K=3 anneal qubits= 20 raw   +1.73% (0 broken) -> polished   +0.19% (0 broken)
+block n= 7 K=4 anneal qubits= 34 raw   +0.91% (0 broken) -> polished   +0.24% (0 broken)
+block n= 7 K=6 anneal qubits= 61 raw   +0.80% (0 broken) -> polished   +0.24% (0 broken)
+day   n= 7 full 24h  qubits= 523 raw   +0.33% (0 broken) -> polished   +0.24%
+saved /home/jovyan/tn-quantum-hackathon/3-tva-plant-scheduling/explanation/results/blocks.json
+block n= 8 K=2 qaoa   qubits= 16 raw  +12.72% (1 broken) -> polished   +2.06% (0 broken)
+block n= 8 K=3 anneal qubits= 28 raw   +3.01% (0 broken) -> polished   +1.33% (0 broken)
+block n= 8 K=4 anneal qubits= 43 raw   +1.95% (0 broken) -> polished   +0.45% (0 broken)
+block n= 8 K=6 anneal qubits= 72 raw   +1.20% (0 broken) -> polished   +0.45% (0 broken)
+day   n= 8 full 24h  qubits= 605 raw   +0.62% (0 broken) -> polished   +0.51%
+saved /home/jovyan/tn-quantum-hackathon/3-tva-plant-scheduling/explanation/results/blocks.json
+block n= 9 K=2 anneal qubits= 18 raw   +4.48% (0 broken) -> polished   +1.37% (0 broken)
+block n= 9 K=3 anneal qubits= 31 raw   +3.39% (0 broken) -> polished   +1.36% (0 broken)
+block n= 9 K=4 anneal qubits= 48 raw   +2.64% (0 broken) -> polished   +1.00% (0 broken)
+block n= 9 K=6 anneal qubits= 79 raw   +2.09% (0 broken) -> polished   +1.00% (0 broken)
+day   n= 9 full 24h  qubits= 677 raw   +0.19% (0 broken) -> polished   +0.08%
+saved /home/jovyan/tn-quantum-hackathon/3-tva-plant-scheduling/explanation/results/blocks.json
+block n=10 K=2 anneal qubits= 20 raw   +6.41% (0 broken) -> polished   +1.21% (0 broken)
+block n=10 K=3 anneal qubits= 34 raw   +4.37% (0 broken) -> polished   +0.85% (0 broken)
+block n=10 K=4 anneal qubits= 53 raw   +3.20% (0 broken) -> polished   +0.85% (0 broken)
+block n=10 K=6 anneal qubits= 86 raw   +2.56% (0 broken) -> polished   +0.85% (0 broken)
+day   n=10 full 24h  qubits= 701 raw   +0.48% (0 broken) -> polished   +0.24%
+saved /home/jovyan/tn-quantum-hackathon/3-tva-plant-scheduling/explanation/results/blocks.json
