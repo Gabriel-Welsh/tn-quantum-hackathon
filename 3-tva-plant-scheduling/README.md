@@ -6,7 +6,7 @@ Every day TVA decides which power plants to switch on for each hour of tomorrow,
 
 Power engineers split the job in two:
 - **Unit commitment** decides which plants are online each hour (the yes-or-no part, where your quantum work goes).
-- **Economic dispatch** decides how much each online plant produces (classical; `check.py` does it for you).
+- **Economic dispatch** decides how much each online plant produces (classical; `scheduling/check.py` does it for you).
 
 What drives the choices:
 - A plant's **marginal cost** (cost of one more MWh) is roughly heat rate × fuel price + variable operating cost.
@@ -37,10 +37,10 @@ A pizzeria with several ovens. Big ovens are cheap per pizza but take hours to p
 
 ## Start here
 
-1. Open `starter.ipynb` in qBraid Lab with the **qBraid-SDK (v0.12.2)** kernel (pick it in the Select Kernel box).
+1. Open `notebooks/starter.ipynb` in qBraid Lab with the **qBraid-SDK (v0.12.2)** kernel (pick it in the Select Kernel box).
 2. Run the cells from the top. They load the data, plot it and solve the classical baseline.
 3. Fill in the TODOs: **TODO 1** cheapest-first rule, **TODO 2** cost of one plant for one hour, **TODO 3** the QUBO. Every cell after them already works and uses your code.
-4. Early on, one teammate works through [`qaoa_primer.ipynb`](./qaoa_primer.ipynb) (the 6-node part, about 45 minutes) while the rest start milestones 1 and 2. It shows QAOA's three pieces (cost layer, mixer, optimizer) on a textbook problem, Max-Cut.
+4. Early on, one teammate works through [`notebooks/qaoa_primer.ipynb`](./notebooks/qaoa_primer.ipynb) (the 6-node part, about 45 minutes) while the rest start milestones 1 and 2. It shows QAOA's three pieces (cost layer, mixer, optimizer) on a textbook problem, Max-Cut.
 5. **Start your deck now.** One teammate reads [`background/`](./background/) (TVA's overview) and owns the customer questions in "Customer and value proposition" below. Bring them to a TVA mentor.
 
 ## The data
@@ -60,7 +60,7 @@ The rules, each hour:
 - At midnight only COAL is running.
 - Daily cost = startup costs + no-load costs + energy costs.
 
-## The checker (`check.py`)
+## The checker (`scheduling/check.py`)
 
 | Function | What it does |
 |---|---|
@@ -70,7 +70,7 @@ The rules, each hour:
 | `check_hour(plants, demand_mw, reserve_mw, choice, was_on=...)` | Scores one hour's on/off choice and says whether it's the best of all 32 ("Match!"), without showing the best one |
 | `locks(plants, history)` | Which plants min up/down times force on or off next hour |
 
-Run `%run check.py` in a notebook cell for a short demo.
+Run `%run ../scheduling/check.py` from `notebooks/` in a notebook cell for a short demo.
 
 ## Milestones
 
@@ -92,9 +92,9 @@ Words you will meet:
 
 ## What judges look for
 
-On Sunday morning, you present your pitch deck to this track's judges, and they ask you to walk them through your work. Understanding and clarity count most: why your QUBO works, what the hour-by-hour loop does, and what your results mean for a utility. Code counts less. See the [main README](../README.md#what-judges-look-for).
+On Sunday morning, you present your pitch deck to this track's judges, and they ask you to walk them through your work. Understanding and clarity count most: why your QUBO works, what the hour-by-hour loop does, and what your results mean for a utility. Code counts less. See the main hackathon README for judging criteria.
 
-**Due Sunday 9:00 AM:** your pitch deck and your code as a ZIP ([what to submit, and where](../README.md#what-to-submit)). Have your notebook and any tools you built, run with their outputs and your IonQ job IDs. Be ready to explain:
+**Due Sunday 9:00 AM:** your pitch deck and your code as a ZIP (see the main hackathon README for submission details). Have your notebook and any tools you built, run with their outputs and your IonQ job IDs. Be ready to explain:
 - **Your solution:** your daily cost against the exact baseline and the cheapest-first rule, how often your answers were valid, any rules broken, and the hardware result next to the simulator.
 - **Customer and value proposition:** who would use your method at a utility, what they use today (a MILP solver like the one provided), and what it would take for them to trust a new one, including time waiting in the hardware queue. For value, find a dated figure for a utility's yearly fuel and purchased-power costs, say which part your method could affect, and work out what a 1% change in that part would mean. Call it a scenario, not proven savings, and don't scale this toy day up to TVA's size.
 - **What you learned:** where quantum honestly stands on this problem (see below).
@@ -143,16 +143,21 @@ Reading: Koretsky et al. (2021, [arXiv:2110.12624](https://arxiv.org/abs/2110.12
 
 A team that shows where its hybrid approach lost cost or broke a rule, and explains why, should score well.
 
-## Files
+## Project layout
 
 | File | What it is |
 |---|---|
 | `README.md` | This page |
-| `starter.ipynb` | The starter notebook: scaffold, TODOs, QAOA loop, hardware cell |
-| `qaoa_primer.ipynb` | QAOA on Max-Cut, the textbook example (milestone 3; the 12-node part is optional) |
-| `check.py` | Data loader, schedule checker, MILP baseline |
+| `notebooks/` | Starter, primer, improvements, and hybrid interface notebooks |
+| `scheduling/` | Checker, MILP baseline, QAOA schedulers, and warm-start script |
 | `data/` | Plants, demand, source and license notes |
 | `background/` | TVA's original problem, its two background documents, and what changed for this event |
+| `docs/` | Quantum warm-start guide |
+| `explanation/` | Research figures, experiment scripts, and supporting results |
+| `experiments/` | Additional scheduling experiments and their reports |
+| `hybrid_uc/` | Hybrid unit-commitment package and analysis |
+| `input_app/` | Plant and demand editor with scheduling UI |
+| `outputs/` | Saved example schedules and chart |
 
 ## Links
 
@@ -160,5 +165,5 @@ A team that shows where its hybrid approach lost cost or broke a rule, and expla
 - RTS-GMLC test system: https://github.com/GridMod/RTS-GMLC (TVA's recommended data; see also the [Reliability Test System page](https://www.nlr.gov/grid/reliability-test-system), and Prescient's [guide to the generator file's columns](https://prescient.readthedocs.io/en/stable/reference/file_formats/rts-gmlc/gen.html))
 - Smaller MATPOWER instances TVA suggested, such as `case24_ieee_rts`: https://matpower.app/manual/matpower/ExamplematpowerCases.html (MATPOWER's function and case reference: https://matpower.org/docs/ref/matpower5.0/menu5.0.html)
 - Koretsky et al., "Adapting Quantum Approximation Optimization Algorithm (QAOA) for Unit Commitment", 2021: https://arxiv.org/abs/2110.12624
-- QAOA primer (part of milestone 3): [`qaoa_primer.ipynb`](./qaoa_primer.ipynb)
+- QAOA primer (part of milestone 3): [`notebooks/qaoa_primer.ipynb`](./notebooks/qaoa_primer.ipynb)
 - The qBraid Award is open to every team (optional): `../4-qbraid-award/`

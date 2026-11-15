@@ -7,7 +7,7 @@ This folder explains our path through the TVA plant-scheduling problem in four s
 3. We grouped hours together, up to one QUBO for the whole day.
 4. We gave up on QAOA *replacing* the MILP and used it to *warm-start* the MILP instead.
 
-Every number below comes from `results/*.json`. Every figure comes from `make_figures.py`. Every experiment was re-run with `run_experiments.py`, which only *calls* the project's existing code (`check.py`, `run_qaoa_schedule.py`, `block_qubo.py`, `run_all_24h_qaoa_schedule.py`, `quantum_warm_start_milp.py`) and changes none of it.
+Every number below comes from `results/*.json`. Every figure comes from `make_figures.py`. Every experiment was re-run with `run_experiments.py`, which only *calls* the project's existing code in `../scheduling/` (`check.py`, `run_qaoa_schedule.py`, `block_qubo.py`, `run_all_24h_qaoa_schedule.py`, `quantum_warm_start_milp.py`) and changes none of it.
 
 **Everything quantum here is simulated** on an exact statevector on this Lab instance. No jobs were submitted and no credits were used.
 
@@ -33,7 +33,7 @@ The warm-start experiment needs bigger MILPs, so it uses `quantum_warm_start_mil
 | Gap vs MILP (mean of 3 seeds) | +17.8% | +3.3% | +10.1% | +29.7% | +39.3% | +46.5% | +41.4% | **+48.1%** |
 | Rules broken per day | 9.7 | 2.0 | 2.7 | 12.3 | 16.3 | 22.0 | 22.0 | **28.0** |
 
-**What it shows:** as the fleet grows, pure QAOA's schedules get both more expensive and less valid. Two reasons, both diagnosed in `../qaoa_improvements.ipynb`:
+**What it shows:** as the fleet grows, pure QAOA's schedules get both more expensive and less valid. Two reasons, both diagnosed in `../notebooks/qaoa_improvements.ipynb`:
 
 - The capacity penalty dominates the energy, so QAOA learns "have enough capacity" much better than "be cheap".
 - One hour at a time, it cannot see the min up/down rules or a startup that pays off later.
@@ -96,7 +96,7 @@ Counts come from the project's own QUBO builders, with no solving involved.
 | K = 12 blocks | 21 | 63 | 178 | 207 |
 | Full 24-hour QUBO | 279 | 377 | 605 | 701 |
 
-**How to read it:** each plant adds a fixed number of qubits *per time step*. So qubits grow with plants × time steps, about linearly in each. What explodes is the **search space**: a QAOA circuit on q qubits works over all 2^q bitstrings at once, so every extra plant multiplies the state space by 2^(time steps). The full day for 10 plants is 2^701 ≈ 10^211 bitstrings. Exact simulation stops near 20–30 qubits (2^30 amplitudes is a 16 GB statevector). Today's QPUs can't run hundreds of high-quality qubits with the very many two-qubit gates these QUBOs need: even the 5-plant, 2-block QUBO in `../QUANTUM_WARM_START.md` §4b already has 25 RZZ gates per layer. Block counts can dip, as from 5 to 6 plants at K=2, because presolve fixes bits no valid schedule can change.
+**How to read it:** each plant adds a fixed number of qubits *per time step*. So qubits grow with plants × time steps, about linearly in each. What explodes is the **search space**: a QAOA circuit on q qubits works over all 2^q bitstrings at once, so every extra plant multiplies the state space by 2^(time steps). The full day for 10 plants is 2^701 ≈ 10^211 bitstrings. Exact simulation stops near 20–30 qubits (2^30 amplitudes is a 16 GB statevector). Today's QPUs can't run hundreds of high-quality qubits with the very many two-qubit gates these QUBOs need: even the 5-plant, 2-block QUBO in `../docs/QUANTUM_WARM_START.md` §4b already has 25 RZZ gates per layer. Block counts can dip, as from 5 to 6 plants at K=2, because presolve fixes bits no valid schedule can change.
 
 **The dilemma:** the formulations that give good schedules (whole day, many blocks) need the most qubits, and the ones that fit on a quantum computer (one hour, two blocks) leave the biggest gaps.
 
@@ -104,7 +104,7 @@ Counts come from the project's own QUBO builders, with no solving involved.
 
 ## 5. Why we ended up warm-starting the MILP — `figures/05_warm_start_timeline.png`, `figures/06_warm_start_metrics.png`
 
-Steps 1–4 point to one conclusion. A QAOA-sized QUBO can produce a *good* schedule, but it can't produce a *proven optimal* one, and it can't scale to a whole day. The MILP is exact and fast, but it starts from nothing. So we combined them (`../quantum_warm_start_milp.py`, explained in `../QUANTUM_WARM_START.md`):
+Steps 1–4 point to one conclusion. A QAOA-sized QUBO can produce a *good* schedule, but it can't produce a *proven optimal* one, and it can't scale to a whole day. The MILP is exact and fast, but it starts from nothing. So we combined them (`../scheduling/quantum_warm_start_milp.py`, explained in `../docs/QUANTUM_WARM_START.md`):
 
 1. A small block QUBO (QAOA when ≤ 20 qubits, annealing above that) proposes on/off schedules.
 2. Classical `repair` makes them legal, and the cheapest one becomes a full MILP solution vector.

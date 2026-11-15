@@ -11,11 +11,11 @@ import matplotlib
 matplotlib.use("Agg")
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
-sys.path.insert(0, ROOT)
+sys.path.insert(0, os.path.join(ROOT, "scheduling"))
 os.chdir(ROOT)
 
 # ---- load the notebook's functions -------------------------------------------------
-nb = json.load(open("starter.ipynb"))
+nb = json.load(open("notebooks/starter.ipynb"))
 code = []
 for cell in nb["cells"]:
     if cell["cell_type"] != "code":
