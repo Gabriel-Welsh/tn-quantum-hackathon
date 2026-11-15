@@ -12,6 +12,7 @@ Figure                               Data file        Made by run_experiments.py
 05_warm_start_timeline.png           warm.json        warm
 06_warm_start_metrics.png            warm.json        warm
 07_summary.png                       pure/blocks/warm  (all of the above)
+08_why_pure_qaoa_breaks_rules.png    diagnose.json    (explanation/diagnose_pure_qaoa.py)
 """
 import json
 from pathlib import Path
@@ -68,31 +69,40 @@ def note(fig, text, y=-0.02):
 
 
 # ------------------------------------------------------------------ 1 + 2
-def fig_pure(rows):
-    ns, gap, glo, ghi = agg(rows, "gap", method="pure")
-    _, brk, blo, bhi = agg(rows, "broken", method="pure")
+def fig_pure(rows, before=None):
+    """before = results/no_locks/pure.json: the earlier, incorrect "pure" version, drawn faint."""
+    ns, gap, glo, ghi = agg(rows, "gap", method="qaoa")
+    _, brk, blo, bhi = agg(rows, "broken", method="qaoa")
+    q = {r["n"]: r["qubits"] for r in rows if r["method"] == "qaoa"}
     fig, (a1, a2) = plt.subplots(1, 2, figsize=(11, 4.2))
     a1.axhline(0, color=BLUE, lw=2)
-    a1.text(ns[0], 0.6, "MILP optimum (0%)", color=INK2, fontsize=9)
+    a1.text(ns[0], 0.8, "MILP optimum (0%)", color=INK2, fontsize=9)
+    if before:
+        bns, bg, _, _ = agg(before, "gap", method="pure")
+        _, bb, _, _ = agg(before, "broken", method="pure")
+        a1.plot(bns, bg, "o--", color=MUTED, lw=1.5, ms=5, label="earlier: no locks, lowest-energy sample")
+        a2.plot(bns, bb, "o--", color=MUTED, lw=1.5, ms=5, label="earlier version")
     a1.fill_between(ns, glo, ghi, color=ORANGE, alpha=0.15, lw=0)
-    a1.plot(ns, gap, "o-", color=ORANGE, label="pure QAOA, hour by hour")
-    a1.set(xlabel="number of plants", ylabel="daily cost vs MILP optimum (%)",
-           title="Pure QAOA: cost gap to the MILP")
-    a1.legend(loc="upper left")
+    a1.plot(ns, gap, "o-", color=ORANGE, label="QAOA, starter formulation")
+    a1.set(xlabel="number of plants (qubits per hour)", ylabel="daily cost vs MILP optimum (%)",
+           title="Hour-by-hour QAOA: cost gap to the MILP")
+    a1.legend(loc="upper left", fontsize=8.5)
     a2.fill_between(ns, blo, bhi, color=ORANGE, alpha=0.15, lw=0)
-    a2.plot(ns, brk, "o-", color=ORANGE)
-    a2.set(xlabel="number of plants", ylabel="rules broken in the day",
-           title="Pure QAOA: broken rules (invalid schedules)")
+    a2.plot(ns, brk, "o-", color=ORANGE, label="QAOA, starter formulation")
+    a2.set(xlabel="number of plants (qubits per hour)", ylabel="rules broken in the day",
+           title="Hour-by-hour QAOA: broken rules")
+    a2.legend(loc="upper left", fontsize=8.5)
     for a in (a1, a2):
-        a.set_xticks(ns)
-    note(fig, "Pure QAOA = one-hour QUBO (costs + capacity penalty with slack qubits), QAOA p=1 on an exact "
-              "statevector, 200 shots, lowest-energy sample kept; no lock, feasibility check or repair. Line = mean "
-              "of 3 seeds, band = min-max. A negative gap is not a win: those schedules break rules (right panel), "
-              "so they are not allowed. Fleet = first N plants of plants10.csv, demand scaled to capacity.")
+        a.set_xticks(ns, [f"{n}\n({q[n]})" for n in ns])
+    note(fig, "Starter formulation (starter.ipynb schedule_day): one-hour QUBO = costs + capacity penalty (3 slack "
+              "qubits) + min up/down lock penalties; QAOA p=1, 200 shots; the cheapest sample that is valid this hour "
+              "is kept. No look-ahead or repair. Line = mean of 3 seeds, band = min-max. Dashed gray = our first "
+              "version, which left the locks out of the QUBO and kept the lowest-energy sample instead. Fleet = "
+              "first N plants of plants10.csv, demand scaled to capacity.", y=-0.08)
     save(fig, "01_pure_qaoa_vs_milp.png")
 
     fig, (a1, a2) = plt.subplots(1, 2, figsize=(11, 4.2))
-    for method, col, lab in [("pure", ORANGE, "pure QAOA"), ("rules", AQUA, "QAOA + rule checking")]:
+    for method, col, lab in [("qaoa", ORANGE, "QAOA (starter formulation)"), ("rules", AQUA, "QAOA + rule checking")]:
         ns, g, lo, hi = agg(rows, "gap", method=method)
         a1.fill_between(ns, lo, hi, color=col, alpha=0.15, lw=0)
         a1.plot(ns, g, "o-", color=col, label=lab)
@@ -107,10 +117,10 @@ def fig_pure(rows):
     a2.legend(loc="best")
     for a in (a1, a2):
         a.set_xticks(ns)
-    note(fig, "Rule checking (run_qaoa_schedule.schedule_day, credit off): min up/down locks added to the QUBO, a "
-              "look-ahead check that switching a plant off can't leave a later hour short, only valid samples "
-              "may be picked (cheapest by exact cost), then classical local search / repair. Every schedule is "
-              "valid, but the hour-by-hour view still can't see startups that pay off later, so a gap remains.")
+    note(fig, "Rule checking = run_qaoa_schedule.schedule_day (credit off): the starter formulation plus a look-ahead "
+              "lock (a running plant stays on if switching it off would leave a later hour short even with everything "
+              "else on) and classical local-search repair. That removes the few dead-end breaks the starter formulation "
+              "hits at 6+ plants; the hour-by-hour view still can't see startups that pay off later, so a gap remains.")
     save(fig, "02_rule_checking.png")
 
 
@@ -255,11 +265,11 @@ def fig_summary(pure, blocks, warm):
     labels, vals, cols, notes = [], [], [], []
     n = 10
     if pure:
-        for m, lab, col in [("pure", "pure QAOA\n(hour by hour)", ORANGE),
+        for m, lab, col in [("qaoa", "QAOA\n(hour by hour)", ORANGE),
                             ("rules", "+ rule checking", AQUA)]:
             v = [r for r in pure if r["n"] == n and r["method"] == m]
             labels.append(lab), vals.append(np.mean([r["gap"] for r in v])), cols.append(col)
-            notes.append(f"{np.mean([r['broken'] for r in v]):.0f} rules broken")
+            notes.append(f"{np.mean([r['broken'] for r in v]):.1f} rules broken (mean)")
     if blocks:
         valid = [r for r in blocks if r["n"] == n and not r.get("full_day") and r["broken"] == 0]
         if valid:
@@ -289,10 +299,41 @@ def fig_summary(pure, blocks, warm):
     save(fig, "07_summary.png")
 
 
+# ------------------------------------------------------------------ 8
+def fig_diagnose(D):
+    modes = [("MILP", "MILP\noptimum"), ("A", "A: no locks,\nlowest energy"), ("B", "B: + locks\nin QUBO"),
+             ("C", "C: + cheapest\nvalid sample"), ("D", "D: + rule\nchecking")]
+    sizes = [n for n in ("5", "6", "10") if n in D]
+    fig, axes = plt.subplots(1, len(sizes), figsize=(5.2 * len(sizes), 4.6), sharey=True)
+    for a, n in zip(axes, sizes):
+        x = np.arange(len(modes))
+        bottom = np.zeros(len(modes))
+        for key, lab, col in [("energy_cost", "energy", BLUE), ("no_load_cost", "no-load", AQUA),
+                              ("startup_cost", "startups", ORANGE)]:
+            v = np.array([D[n][m][key] for m, _ in modes]) / 1000
+            a.bar(x, v, 0.62, bottom=bottom, color=col, label=lab, edgecolor=SURFACE, linewidth=1.5)
+            bottom += v
+        for i, (m, _) in enumerate(modes):
+            r = D[n][m]
+            a.text(i, bottom[i] + 8, f"{r['gap']:+.1f}%\n{r['broken']} broken\n{r['startups']} starts",
+                   ha="center", va="bottom", fontsize=8)
+        a.set(xticks=x, title=f"{n} plants (seed 0)")
+        a.set_xticklabels([l for _, l in modes], fontsize=7.5)
+    axes[0].set_ylabel("daily cost ($ thousands)")
+    axes[0].set_ylim(0, max(D[n][m]["cost"] for n in sizes for m, _ in modes) / 1000 * 1.25)
+    axes[0].legend(loc="upper left", fontsize=8.5)
+    note(fig, "diagnose_pure_qaoa.py, 3 slack qubits, QAOA p=1, 200 shots. A = our first figure 01. B adds the starter's "
+              "min up/down lock penalties to the QUBO; C also keeps the cheapest sample that is valid this hour instead "
+              "of the lowest-energy one: that is the starter formulation (C = +7.06%, 0 broken at 5 plants). Its "
+              "remaining breaks at 6 and 10 plants are dead ends: a big plant is switched off, a later peak can't be met "
+              "while its min-down lock holds, so the lock has to be broken. D's look-ahead prevents that.", y=-0.04)
+    save(fig, "08_why_pure_qaoa_breaks_rules.png")
+
+
 def main():
     pure, blocks, qubits, warm = (load(k) for k in ("pure", "blocks", "qubits", "warm"))
     if pure:
-        fig_pure(pure)
+        fig_pure(pure, load("no_locks/pure"))
     if blocks:
         fig_blocks(blocks, pure)
     if qubits:
@@ -300,6 +341,8 @@ def main():
     if warm:
         fig_warm(warm)
     fig_summary(pure, blocks, warm)
+    if load("diagnose"):
+        fig_diagnose(load("diagnose"))
 
 
 if __name__ == "__main__":

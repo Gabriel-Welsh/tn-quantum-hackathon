@@ -1,0 +1,1915 @@
+{
+ "5": {
+  "MILP": {
+   "gap": 0.0,
+   "broken": 0,
+   "cost": 327924.49,
+   "startup_cost": 32930.0,
+   "no_load_cost": 20178.0,
+   "energy_cost": 274816.48999999993,
+   "startups": 3
+  },
+  "A": {
+   "gap": 11.816760010818358,
+   "broken": 4,
+   "kinds": {
+    "min up/down": 4
+   },
+   "startups": 11,
+   "cost": 366674.54000000004,
+   "hours": [
+    {
+     "hour": 0,
+     "A": 57442.4,
+     "max_c": 28721.2,
+     "p_valid": 0.5655416272376025,
+     "p_valid_uniform": 0.53125,
+     "p_ground": 0.00303158989559131,
+     "sample_is_ground": true,
+     "distinct": 161,
+     "valid_energy_spread": 0.4658986018044244,
+     "pick": "COAL",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 1,
+     "A": 57442.4,
+     "max_c": 28721.2,
+     "p_valid": 0.5232579692561097,
+     "p_valid_uniform": 0.5,
+     "p_ground": 0.0030314544824601424,
+     "sample_is_ground": false,
+     "distinct": 155,
+     "valid_energy_spread": 0.4658986018044244,
+     "pick": "COAL+OIL",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 2,
+     "A": 57442.4,
+     "max_c": 28721.2,
+     "p_valid": 0.5232579692561097,
+     "p_valid_uniform": 0.5,
+     "p_ground": 0.0030314759537327465,
+     "sample_is_ground": false,
+     "distinct": 168,
+     "valid_energy_spread": 0.4658986018044244,
+     "pick": "COAL+PEAKER_B+OIL",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 3,
+     "A": 57442.4,
+     "max_c": 28721.2,
+     "p_valid": 0.5232140760997568,
+     "p_valid_uniform": 0.5,
+     "p_ground": 0.0030297432298451773,
+     "sample_is_ground": false,
+     "distinct": 169,
+     "valid_energy_spread": 0.4658986018044244,
+     "pick": "COAL+PEAKER_B",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 4,
+     "A": 57442.4,
+     "max_c": 28721.2,
+     "p_valid": 0.5232140760997568,
+     "p_valid_uniform": 0.5,
+     "p_ground": 0.003029721818868288,
+     "sample_is_ground": true,
+     "distinct": 154,
+     "valid_energy_spread": 0.4658986018044244,
+     "pick": "COAL",
+     "hour_ok": true,
+     "locks_broken": [
+      "PEAKER_B"
+     ]
+    },
+    {
+     "hour": 5,
+     "A": 57442.4,
+     "max_c": 28721.2,
+     "p_valid": 0.5760134551162335,
+     "p_valid_uniform": 0.5625,
+     "p_ground": 0.0019028165991423912,
+     "sample_is_ground": false,
+     "distinct": 163,
+     "valid_energy_spread": 0.42642604235449294,
+     "pick": "COAL+PEAKER_B",
+     "hour_ok": true,
+     "locks_broken": [
+      "PEAKER_B"
+     ]
+    },
+    {
+     "hour": 6,
+     "A": 57442.4,
+     "max_c": 28721.2,
+     "p_valid": 0.7769465567080579,
+     "p_valid_uniform": 0.5,
+     "p_ground": 0.005995202999183651,
+     "sample_is_ground": true,
+     "distinct": 134,
+     "valid_energy_spread": 0.39166462058589296,
+     "pick": "COAL+PEAKER_B+OIL",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 7,
+     "A": 57442.4,
+     "max_c": 28721.2,
+     "p_valid": 0.6423030343742062,
+     "p_valid_uniform": 0.3125,
+     "p_ground": 0.007632361176982275,
+     "sample_is_ground": true,
+     "distinct": 134,
+     "valid_energy_spread": 0.3608819845384875,
+     "pick": "COAL+PEAKER_A+PEAKER_B+OIL",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 8,
+     "A": 57442.4,
+     "max_c": 28721.2,
+     "p_valid": 0.6262744479282507,
+     "p_valid_uniform": 0.25,
+     "p_ground": 0.006035352012896399,
+     "sample_is_ground": true,
+     "distinct": 117,
+     "valid_energy_spread": 0.21317842531162048,
+     "pick": "COAL+GAS_CC",
+     "hour_ok": true,
+     "locks_broken": [
+      "PEAKER_A"
+     ]
+    },
+    {
+     "hour": 9,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "p_valid": 0.6826288681733814,
+     "p_valid_uniform": 0.25,
+     "p_ground": 0.007904072927885215,
+     "sample_is_ground": true,
+     "distinct": 105,
+     "valid_energy_spread": 0.2318655307807336,
+     "pick": "COAL+GAS_CC",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 10,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "p_valid": 0.7357394541786413,
+     "p_valid_uniform": 0.25,
+     "p_ground": 0.010833294215523788,
+     "sample_is_ground": true,
+     "distinct": 100,
+     "valid_energy_spread": 0.25004122628570835,
+     "pick": "COAL+GAS_CC",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 11,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "p_valid": 0.783102057678499,
+     "p_valid_uniform": 0.25,
+     "p_ground": 0.01575014436017781,
+     "sample_is_ground": true,
+     "distinct": 103,
+     "valid_energy_spread": 0.2675797723140843,
+     "pick": "COAL+GAS_CC",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 12,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "p_valid": 0.7615220213551808,
+     "p_valid_uniform": 0.21875,
+     "p_ground": 0.023895978460986053,
+     "sample_is_ground": true,
+     "distinct": 85,
+     "valid_energy_spread": 0.2504310485675862,
+     "pick": "COAL+GAS_CC+OIL",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 13,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "p_valid": 0.7615265125434332,
+     "p_valid_uniform": 0.21875,
+     "p_ground": 0.023897262634903584,
+     "sample_is_ground": true,
+     "distinct": 86,
+     "valid_energy_spread": 0.2504397057728933,
+     "pick": "COAL+GAS_CC+OIL",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 14,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "p_valid": 0.5365703320271346,
+     "p_valid_uniform": 0.125,
+     "p_ground": 0.0373214696938033,
+     "sample_is_ground": true,
+     "distinct": 87,
+     "valid_energy_spread": 0.23464975821684794,
+     "pick": "COAL+GAS_CC+PEAKER_A+OIL",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 15,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "p_valid": 0.5370734777921915,
+     "p_valid_uniform": 0.125,
+     "p_ground": 0.03739906002203356,
+     "sample_is_ground": true,
+     "distinct": 79,
+     "valid_energy_spread": 0.23469012581880747,
+     "pick": "COAL+GAS_CC+PEAKER_A+OIL",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 16,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "p_valid": 0.7831626846487727,
+     "p_valid_uniform": 0.25,
+     "p_ground": 0.01570669913218983,
+     "sample_is_ground": true,
+     "distinct": 94,
+     "valid_energy_spread": 0.2675797723140843,
+     "pick": "COAL+GAS_CC",
+     "hour_ok": true,
+     "locks_broken": [
+      "PEAKER_A"
+     ]
+    },
+    {
+     "hour": 17,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "p_valid": 0.7357203341163145,
+     "p_valid_uniform": 0.25,
+     "p_ground": 0.010832839599461517,
+     "sample_is_ground": true,
+     "distinct": 109,
+     "valid_energy_spread": 0.25004122628570835,
+     "pick": "COAL+GAS_CC",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 18,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "p_valid": 0.7357203341163145,
+     "p_valid_uniform": 0.25,
+     "p_ground": 0.010832839599461517,
+     "sample_is_ground": true,
+     "distinct": 103,
+     "valid_energy_spread": 0.25004122628570835,
+     "pick": "COAL+GAS_CC",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 19,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "p_valid": 0.682584023409626,
+     "p_valid_uniform": 0.25,
+     "p_ground": 0.007903513197556564,
+     "sample_is_ground": false,
+     "distinct": 118,
+     "valid_energy_spread": 0.2318655307807336,
+     "pick": "COAL+GAS_CC+OIL",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 20,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "p_valid": 0.6825840234096261,
+     "p_valid_uniform": 0.25,
+     "p_ground": 0.007902973774658546,
+     "sample_is_ground": true,
+     "distinct": 112,
+     "valid_energy_spread": 0.2318655307807336,
+     "pick": "COAL+GAS_CC",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 21,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "p_valid": 0.642429117577346,
+     "p_valid_uniform": 0.3125,
+     "p_ground": 0.0052520855800371824,
+     "sample_is_ground": false,
+     "distinct": 124,
+     "valid_energy_spread": 0.3618470030979199,
+     "pick": "COAL+GAS_CC+OIL",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 22,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "p_valid": 0.7766528381841067,
+     "p_valid_uniform": 0.5,
+     "p_ground": 0.0044689021634306565,
+     "sample_is_ground": true,
+     "distinct": 143,
+     "valid_energy_spread": 0.39230144459301,
+     "pick": "COAL+GAS_CC",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 23,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "p_valid": 0.6608884038527808,
+     "p_valid_uniform": 0.5625,
+     "p_ground": 0.004004913210818577,
+     "sample_is_ground": false,
+     "distinct": 152,
+     "valid_energy_spread": 0.426297661214316,
+     "pick": "GAS_CC+OIL",
+     "hour_ok": true,
+     "locks_broken": []
+    }
+   ],
+   "startup_cost": 49030.0,
+   "no_load_cost": 28562.0,
+   "energy_cost": 289082.54000000004,
+   "violations": [
+    [
+     "4",
+     "PEAKER_B",
+     "min up broken",
+     "turned off after 2 h on (needs 3)"
+    ],
+    [
+     "5",
+     "PEAKER_B",
+     "min down broken",
+     "restarted after 1 h off (needs 3)"
+    ],
+    [
+     "8",
+     "PEAKER_A",
+     "min up broken",
+     "turned off after 1 h on (needs 3)"
+    ],
+    [
+     "16",
+     "PEAKER_A",
+     "min up broken",
+     "turned off after 2 h on (needs 3)"
+    ]
+   ]
+  },
+  "B": {
+   "gap": 6.07212959300478,
+   "broken": 3,
+   "kinds": {
+    "min up/down": 3
+   },
+   "startups": 6,
+   "cost": 347836.49,
+   "hours": [
+    {
+     "hour": 0,
+     "A": 57442.4,
+     "max_c": 28721.2,
+     "pick": "COAL",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 1,
+     "A": 57442.4,
+     "max_c": 28721.2,
+     "pick": "COAL",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 2,
+     "A": 57442.4,
+     "max_c": 28721.2,
+     "pick": "COAL",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 3,
+     "A": 57442.4,
+     "max_c": 28721.2,
+     "pick": "COAL",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 4,
+     "A": 57442.4,
+     "max_c": 28721.2,
+     "pick": "COAL",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 5,
+     "A": 57442.4,
+     "max_c": 28721.2,
+     "pick": "COAL+OIL",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 6,
+     "A": 57442.4,
+     "max_c": 28721.2,
+     "pick": "COAL+PEAKER_A+OIL",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 7,
+     "A": 57442.4,
+     "max_c": 28721.2,
+     "pick": "COAL+PEAKER_A+PEAKER_B+OIL",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 8,
+     "A": 57442.4,
+     "max_c": 28721.2,
+     "pick": "COAL+GAS_CC",
+     "hour_ok": true,
+     "locks_broken": [
+      "PEAKER_A",
+      "PEAKER_B"
+     ]
+    },
+    {
+     "hour": 9,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "pick": "COAL+GAS_CC",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 10,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "pick": "COAL+GAS_CC",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 11,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "pick": "COAL+GAS_CC",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 12,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "pick": "COAL+GAS_CC+OIL",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 13,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "pick": "COAL+GAS_CC+OIL",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 14,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "pick": "COAL+GAS_CC+PEAKER_A+OIL",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 15,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "pick": "COAL+GAS_CC+PEAKER_A+OIL",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 16,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "pick": "COAL+GAS_CC",
+     "hour_ok": true,
+     "locks_broken": [
+      "PEAKER_A"
+     ]
+    },
+    {
+     "hour": 17,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "pick": "COAL+GAS_CC",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 18,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "pick": "COAL+GAS_CC",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 19,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "pick": "COAL+GAS_CC",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 20,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "pick": "COAL+GAS_CC",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 21,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "pick": "COAL+GAS_CC",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 22,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "pick": "COAL+GAS_CC",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 23,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "pick": "COAL+GAS_CC",
+     "hour_ok": true,
+     "locks_broken": []
+    }
+   ],
+   "startup_cost": 43360.0,
+   "no_load_cost": 23779.0,
+   "energy_cost": 280697.49,
+   "violations": [
+    [
+     "8",
+     "PEAKER_A",
+     "min up broken",
+     "turned off after 2 h on (needs 3)"
+    ],
+    [
+     "8",
+     "PEAKER_B",
+     "min up broken",
+     "turned off after 1 h on (needs 3)"
+    ],
+    [
+     "16",
+     "PEAKER_A",
+     "min up broken",
+     "turned off after 2 h on (needs 3)"
+    ]
+   ]
+  },
+  "C": {
+   "gap": 7.061915381800226,
+   "broken": 0,
+   "kinds": {},
+   "startups": 6,
+   "cost": 351082.23999999993,
+   "hours": [
+    {
+     "hour": 0,
+     "A": 57442.4,
+     "max_c": 28721.2,
+     "pick": "COAL",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 1,
+     "A": 57442.4,
+     "max_c": 28721.2,
+     "pick": "COAL",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 2,
+     "A": 57442.4,
+     "max_c": 28721.2,
+     "pick": "COAL",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 3,
+     "A": 57442.4,
+     "max_c": 28721.2,
+     "pick": "COAL",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 4,
+     "A": 57442.4,
+     "max_c": 28721.2,
+     "pick": "COAL",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 5,
+     "A": 57442.4,
+     "max_c": 28721.2,
+     "pick": "COAL+OIL",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 6,
+     "A": 57442.4,
+     "max_c": 28721.2,
+     "pick": "COAL+PEAKER_A+OIL",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 7,
+     "A": 57442.4,
+     "max_c": 28721.2,
+     "pick": "COAL+PEAKER_A+PEAKER_B+OIL",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 8,
+     "A": 57442.4,
+     "max_c": 28721.2,
+     "pick": "COAL+GAS_CC+PEAKER_A+PEAKER_B",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 9,
+     "A": 4821.2,
+     "max_c": 2410.6,
+     "pick": "COAL+GAS_CC+PEAKER_B",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 10,
+     "A": 11474.0,
+     "max_c": 5737.0,
+     "pick": "COAL+GAS_CC",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 11,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "pick": "COAL+GAS_CC",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 12,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "pick": "COAL+GAS_CC+OIL",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 13,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "pick": "COAL+GAS_CC+OIL",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 14,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "pick": "COAL+GAS_CC+PEAKER_A+OIL",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 15,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "pick": "COAL+GAS_CC+PEAKER_A+OIL",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 16,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "pick": "COAL+GAS_CC+PEAKER_A",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 17,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "pick": "COAL+GAS_CC",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 18,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "pick": "COAL+GAS_CC",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 19,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "pick": "COAL+GAS_CC",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 20,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "pick": "COAL+GAS_CC",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 21,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "pick": "COAL+GAS_CC",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 22,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "pick": "COAL+GAS_CC",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 23,
+     "A": 12510.8,
+     "max_c": 6255.4,
+     "pick": "COAL+GAS_CC",
+     "hour_ok": true,
+     "locks_broken": []
+    }
+   ],
+   "startup_cost": 43360.0,
+   "no_load_cost": 26163.0,
+   "energy_cost": 281559.23999999993,
+   "violations": []
+  },
+  "D": {
+   "gap": 7.061915381800226,
+   "broken": 0,
+   "kinds": {},
+   "startups": 6,
+   "cost": 351082.23999999993,
+   "hours": [],
+   "startup_cost": 43360.0,
+   "no_load_cost": 26163.0,
+   "energy_cost": 281559.23999999993,
+   "violations": []
+  }
+ },
+ "10": {
+  "MILP": {
+   "gap": 0.0,
+   "broken": 0,
+   "cost": 602139.47,
+   "startup_cost": 76610.0,
+   "no_load_cost": 37515.0,
+   "energy_cost": 488014.47,
+   "startups": 7
+  },
+  "A": {
+   "gap": 47.289909429122844,
+   "broken": 32,
+   "kinds": {
+    "min up/down": 32
+   },
+   "startups": 37,
+   "cost": 886890.6800000003,
+   "hours": [
+    {
+     "hour": 0,
+     "A": 57445.76,
+     "max_c": 28722.88,
+     "p_valid": 0.7190693512021115,
+     "p_valid_uniform": 0.583984375,
+     "p_ground": 7.908837847354822e-05,
+     "sample_is_ground": false,
+     "distinct": 196,
+     "valid_energy_spread": 0.4969055642831076,
+     "pick": "COAL+OIL+COAL_MID+GAS_CC_2+OIL_2",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 1,
+     "A": 57445.76,
+     "max_c": 28722.88,
+     "p_valid": 0.6416158576353582,
+     "p_valid_uniform": 0.5888671875,
+     "p_ground": 6.849708026918216e-05,
+     "sample_is_ground": false,
+     "distinct": 197,
+     "valid_energy_spread": 0.5203093512071296,
+     "pick": "COAL+PEAKER_A+PEAKER_B+OIL+COAL_MID+OIL_2",
+     "hour_ok": true,
+     "locks_broken": [
+      "GAS_CC_2"
+     ]
+    },
+    {
+     "hour": 2,
+     "A": 57445.76,
+     "max_c": 28722.88,
+     "p_valid": 0.6834875581293713,
+     "p_valid_uniform": 0.6484375,
+     "p_ground": 6.659059443138782e-05,
+     "sample_is_ground": false,
+     "distinct": 197,
+     "valid_energy_spread": 0.5452868600876877,
+     "pick": "COAL+PEAKER_A+PEAKER_B+OIL+COAL_MID+OIL_2",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 3,
+     "A": 57445.76,
+     "max_c": 28722.88,
+     "p_valid": 0.6834875581293713,
+     "p_valid_uniform": 0.6484375,
+     "p_ground": 6.659059443138782e-05,
+     "sample_is_ground": false,
+     "distinct": 199,
+     "valid_energy_spread": 0.5452868600876877,
+     "pick": "COAL+PEAKER_A+COAL_MID+COAL_SMALL",
+     "hour_ok": true,
+     "locks_broken": [
+      "PEAKER_B"
+     ]
+    },
+    {
+     "hour": 4,
+     "A": 57445.76,
+     "max_c": 28722.88,
+     "p_valid": 0.6723024999047708,
+     "p_valid_uniform": 0.60546875,
+     "p_ground": 7.183514150405753e-05,
+     "sample_is_ground": false,
+     "distinct": 197,
+     "valid_energy_spread": 0.520168660344575,
+     "pick": "COAL+COAL_MID+COAL_SMALL+GAS_CC_2+OIL_2",
+     "hour_ok": true,
+     "locks_broken": [
+      "GAS_CC_2"
+     ]
+    },
+    {
+     "hour": 5,
+     "A": 57445.76,
+     "max_c": 28722.88,
+     "p_valid": 0.769789785910709,
+     "p_valid_uniform": 0.603515625,
+     "p_ground": 7.481000906450492e-05,
+     "sample_is_ground": false,
+     "distinct": 198,
+     "valid_energy_spread": 0.49681680032913145,
+     "pick": "PEAKER_A+PEAKER_B+COAL_MID+COAL_SMALL+GAS_CC_2",
+     "hour_ok": true,
+     "locks_broken": [
+      "PEAKER_A",
+      "PEAKER_B"
+     ]
+    },
+    {
+     "hour": 6,
+     "A": 74594.8,
+     "max_c": 37297.4,
+     "p_valid": 0.8263891408676656,
+     "p_valid_uniform": 0.5263671875,
+     "p_ground": 0.00010601674914103944,
+     "sample_is_ground": false,
+     "distinct": 199,
+     "valid_energy_spread": 0.4545839343677617,
+     "pick": "GAS_CC+OIL+COAL_MID+GAS_CC_2",
+     "hour_ok": true,
+     "locks_broken": [
+      "PEAKER_A",
+      "PEAKER_B",
+      "COAL_SMALL"
+     ]
+    },
+    {
+     "hour": 7,
+     "A": 74594.8,
+     "max_c": 37297.4,
+     "p_valid": 0.7805828461794759,
+     "p_valid_uniform": 0.4208984375,
+     "p_ground": 0.00012772185873597783,
+     "sample_is_ground": false,
+     "distinct": 198,
+     "valid_energy_spread": 0.41751983536731013,
+     "pick": "GAS_CC+PEAKER_B+OIL+COAL_SMALL+GAS_CC_2+OIL_2",
+     "hour_ok": true,
+     "locks_broken": [
+      "PEAKER_B",
+      "COAL_SMALL"
+     ]
+    },
+    {
+     "hour": 8,
+     "A": 74594.8,
+     "max_c": 37297.4,
+     "p_valid": 0.7074215196992921,
+     "p_valid_uniform": 0.3017578125,
+     "p_ground": 0.00018614231863373543,
+     "sample_is_ground": false,
+     "distinct": 194,
+     "valid_energy_spread": 0.3847545330348271,
+     "pick": "GAS_CC+PEAKER_B+OIL+COAL_MID+COAL_SMALL+GAS_CC_2",
+     "hour_ok": true,
+     "locks_broken": [
+      "COAL_MID"
+     ]
+    },
+    {
+     "hour": 9,
+     "A": 74594.8,
+     "max_c": 37297.4,
+     "p_valid": 0.6116000435794986,
+     "p_valid_uniform": 0.189453125,
+     "p_ground": 0.00028739010128937077,
+     "sample_is_ground": false,
+     "distinct": 192,
+     "valid_energy_spread": 0.35564974726192145,
+     "pick": "GAS_CC+PEAKER_A+OIL+COAL_MID+COAL_SMALL+GAS_CC_2+PEAKER_C+OIL_2",
+     "hour_ok": true,
+     "locks_broken": [
+      "PEAKER_B"
+     ]
+    },
+    {
+     "hour": 10,
+     "A": 74594.8,
+     "max_c": 37297.4,
+     "p_valid": 0.5658295247094087,
+     "p_valid_uniform": 0.1474609375,
+     "p_ground": 0.0003641735991807215,
+     "sample_is_ground": false,
+     "distinct": 196,
+     "valid_energy_spread": 0.3423294317529399,
+     "pick": "COAL+GAS_CC+PEAKER_A+GAS_CC_2+PEAKER_C",
+     "hour_ok": true,
+     "locks_broken": [
+      "COAL_MID",
+      "COAL_SMALL",
+      "COAL"
+     ]
+    },
+    {
+     "hour": 11,
+     "A": 44856.0,
+     "max_c": 22428.0,
+     "p_valid": 0.4387213905516277,
+     "p_valid_uniform": 0.0732421875,
+     "p_ground": 0.0007501025644912829,
+     "sample_is_ground": false,
+     "distinct": 192,
+     "valid_energy_spread": 0.3066531770844098,
+     "pick": "COAL+GAS_CC+PEAKER_B+COAL_SMALL+GAS_CC_2+PEAKER_C+OIL_2",
+     "hour_ok": true,
+     "locks_broken": [
+      "PEAKER_A",
+      "PEAKER_B",
+      "COAL_SMALL"
+     ]
+    },
+    {
+     "hour": 12,
+     "A": 44856.0,
+     "max_c": 22428.0,
+     "p_valid": 0.36439133921395894,
+     "p_valid_uniform": 0.0517578125,
+     "p_ground": 0.0009957469685450248,
+     "sample_is_ground": false,
+     "distinct": 192,
+     "valid_energy_spread": 0.2959830719172108,
+     "pick": "COAL+GAS_CC+PEAKER_B+COAL_MID+COAL_SMALL+GAS_CC_2+PEAKER_C",
+     "hour_ok": true,
+     "locks_broken": [
+      "COAL_MID"
+     ]
+    },
+    {
+     "hour": 13,
+     "A": 11474.4,
+     "max_c": 5737.2,
+     "p_valid": 0.27099171643281084,
+     "p_valid_uniform": 0.0322265625,
+     "p_ground": 0.001338200625496589,
+     "sample_is_ground": false,
+     "distinct": 191,
+     "valid_energy_spread": 0.28597330514189334,
+     "pick": "COAL+GAS_CC+PEAKER_A+COAL_MID+COAL_SMALL+GAS_CC_2+PEAKER_C+OIL_2",
+     "hour_ok": true,
+     "locks_broken": [
+      "PEAKER_B",
+      "PEAKER_A"
+     ]
+    },
+    {
+     "hour": 14,
+     "A": 12511.2,
+     "max_c": 6255.6,
+     "p_valid": 0.16901545525661002,
+     "p_valid_uniform": 0.0166015625,
+     "p_ground": 0.0017892903482654115,
+     "sample_is_ground": false,
+     "distinct": 191,
+     "valid_energy_spread": 0.27630735357972336,
+     "pick": "COAL+GAS_CC+PEAKER_A+OIL+COAL_MID+COAL_SMALL+GAS_CC_2+PEAKER_C+OIL_2",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 15,
+     "A": 12511.2,
+     "max_c": 6255.6,
+     "p_valid": 0.16898429046003682,
+     "p_valid_uniform": 0.0166015625,
+     "p_ground": 0.0017887057476641912,
+     "sample_is_ground": false,
+     "distinct": 191,
+     "valid_energy_spread": 0.27630436813708165,
+     "pick": "COAL+GAS_CC+OIL+COAL_MID+COAL_SMALL+GAS_CC_2+PEAKER_C+OIL_2",
+     "hour_ok": true,
+     "locks_broken": [
+      "PEAKER_A"
+     ]
+    },
+    {
+     "hour": 16,
+     "A": 12511.2,
+     "max_c": 6255.6,
+     "p_valid": 0.4388205876411185,
+     "p_valid_uniform": 0.0732421875,
+     "p_ground": 0.0007573846913860836,
+     "sample_is_ground": false,
+     "distinct": 194,
+     "valid_energy_spread": 0.30688792155062655,
+     "pick": "COAL+GAS_CC+OIL+COAL_MID+COAL_SMALL+GAS_CC_2",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 17,
+     "A": 12511.2,
+     "max_c": 6255.6,
+     "p_valid": 0.5247631548394324,
+     "p_valid_uniform": 0.1162109375,
+     "p_ground": 0.00043853312625473416,
+     "sample_is_ground": false,
+     "distinct": 191,
+     "valid_energy_spread": 0.33019406017771813,
+     "pick": "COAL+GAS_CC+PEAKER_B+COAL_MID+GAS_CC_2+PEAKER_C",
+     "hour_ok": true,
+     "locks_broken": [
+      "COAL_SMALL",
+      "PEAKER_C"
+     ]
+    },
+    {
+     "hour": 18,
+     "A": 29855.36,
+     "max_c": 14927.68,
+     "p_valid": 0.5658829685654316,
+     "p_valid_uniform": 0.1474609375,
+     "p_ground": 0.0003377542506516753,
+     "sample_is_ground": false,
+     "distinct": 193,
+     "valid_energy_spread": 0.342438483515848,
+     "pick": "COAL+GAS_CC+PEAKER_A+GAS_CC_2+PEAKER_C",
+     "hour_ok": true,
+     "locks_broken": [
+      "PEAKER_B",
+      "COAL_MID"
+     ]
+    },
+    {
+     "hour": 19,
+     "A": 44856.0,
+     "max_c": 22428.0,
+     "p_valid": 0.6116620760783344,
+     "p_valid_uniform": 0.189453125,
+     "p_ground": 0.00026388185659620336,
+     "sample_is_ground": false,
+     "distinct": 197,
+     "valid_energy_spread": 0.35579996824015503,
+     "pick": "COAL+GAS_CC+PEAKER_A+PEAKER_B+OIL+GAS_CC_2+PEAKER_C+OIL_2",
+     "hour_ok": true,
+     "locks_broken": [
+      "PEAKER_B"
+     ]
+    },
+    {
+     "hour": 20,
+     "A": 44856.0,
+     "max_c": 22428.0,
+     "p_valid": 0.6593937767499299,
+     "p_valid_uniform": 0.2412109375,
+     "p_ground": 0.00020921534627198836,
+     "sample_is_ground": false,
+     "distinct": 190,
+     "valid_energy_spread": 0.36983698786059355,
+     "pick": "COAL+GAS_CC+GAS_CC_2+OIL_2",
+     "hour_ok": true,
+     "locks_broken": [
+      "PEAKER_A",
+      "PEAKER_B"
+     ]
+    },
+    {
+     "hour": 21,
+     "A": 44856.0,
+     "max_c": 22428.0,
+     "p_valid": 0.7496072219242577,
+     "p_valid_uniform": 0.3642578125,
+     "p_ground": 0.00013849926056308748,
+     "sample_is_ground": false,
+     "distinct": 198,
+     "valid_energy_spread": 0.40060236758928314,
+     "pick": "COAL+GAS_CC+OIL+GAS_CC_2+OIL_2",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 22,
+     "A": 44856.0,
+     "max_c": 22428.0,
+     "p_valid": 0.8047793167007748,
+     "p_valid_uniform": 0.4736328125,
+     "p_ground": 9.990750442220042e-05,
+     "sample_is_ground": false,
+     "distinct": 199,
+     "valid_energy_spread": 0.4356359127329725,
+     "pick": "COAL+GAS_CC+PEAKER_A+GAS_CC_2+PEAKER_C",
+     "hour_ok": true,
+     "locks_broken": [
+      "PEAKER_A",
+      "PEAKER_C"
+     ]
+    },
+    {
+     "hour": 23,
+     "A": 44856.0,
+     "max_c": 22428.0,
+     "p_valid": 0.8201243332619331,
+     "p_valid_uniform": 0.572265625,
+     "p_ground": 8.021599951528909e-05,
+     "sample_is_ground": false,
+     "distinct": 198,
+     "valid_energy_spread": 0.47510558279304405,
+     "pick": "COAL+GAS_CC+PEAKER_A+OIL_2",
+     "hour_ok": true,
+     "locks_broken": [
+      "PEAKER_C"
+     ]
+    }
+   ],
+   "startup_cost": 278940.0,
+   "no_load_cost": 61453.0,
+   "energy_cost": 546497.6800000003,
+   "violations": [
+    [
+     "1",
+     "GAS_CC_2",
+     "min up broken",
+     "turned off after 1 h on (needs 8)"
+    ],
+    [
+     "3",
+     "PEAKER_B",
+     "min up broken",
+     "turned off after 2 h on (needs 3)"
+    ],
+    [
+     "4",
+     "GAS_CC_2",
+     "min down broken",
+     "restarted after 3 h off (needs 5)"
+    ],
+    [
+     "5",
+     "PEAKER_A",
+     "min down broken",
+     "restarted after 1 h off (needs 3)"
+    ],
+    [
+     "5",
+     "PEAKER_B",
+     "min down broken",
+     "restarted after 2 h off (needs 3)"
+    ],
+    [
+     "6",
+     "PEAKER_A",
+     "min up broken",
+     "turned off after 1 h on (needs 3)"
+    ],
+    [
+     "6",
+     "PEAKER_B",
+     "min up broken",
+     "turned off after 1 h on (needs 3)"
+    ],
+    [
+     "6",
+     "COAL_SMALL",
+     "min up broken",
+     "turned off after 3 h on (needs 8)"
+    ],
+    [
+     "7",
+     "PEAKER_B",
+     "min down broken",
+     "restarted after 1 h off (needs 3)"
+    ],
+    [
+     "7",
+     "COAL_SMALL",
+     "min down broken",
+     "restarted after 1 h off (needs 4)"
+    ],
+    [
+     "8",
+     "COAL_MID",
+     "min down broken",
+     "restarted after 1 h off (needs 8)"
+    ],
+    [
+     "9",
+     "PEAKER_B",
+     "min up broken",
+     "turned off after 2 h on (needs 3)"
+    ],
+    [
+     "10",
+     "COAL",
+     "min down broken",
+     "restarted after 5 h off (needs 48)"
+    ],
+    [
+     "10",
+     "COAL_MID",
+     "min up broken",
+     "turned off after 2 h on (needs 8)"
+    ],
+    [
+     "10",
+     "COAL_SMALL",
+     "min up broken",
+     "turned off after 3 h on (needs 8)"
+    ],
+    [
+     "11",
+     "PEAKER_A",
+     "min up broken",
+     "turned off after 2 h on (needs 3)"
+    ],
+    [
+     "11",
+     "PEAKER_B",
+     "min down broken",
+     "restarted after 2 h off (needs 3)"
+    ],
+    [
+     "11",
+     "COAL_SMALL",
+     "min down broken",
+     "restarted after 1 h off (needs 4)"
+    ],
+    [
+     "12",
+     "COAL_MID",
+     "min down broken",
+     "restarted after 2 h off (needs 8)"
+    ],
+    [
+     "13",
+     "PEAKER_A",
+     "min down broken",
+     "restarted after 2 h off (needs 3)"
+    ],
+    [
+     "13",
+     "PEAKER_B",
+     "min up broken",
+     "turned off after 2 h on (needs 3)"
+    ],
+    [
+     "15",
+     "PEAKER_A",
+     "min up broken",
+     "turned off after 2 h on (needs 3)"
+    ],
+    [
+     "17",
+     "COAL_SMALL",
+     "min up broken",
+     "turned off after 6 h on (needs 8)"
+    ],
+    [
+     "17",
+     "PEAKER_C",
+     "min down broken",
+     "restarted after 1 h off (needs 3)"
+    ],
+    [
+     "18",
+     "PEAKER_B",
+     "min up broken",
+     "turned off after 1 h on (needs 3)"
+    ],
+    [
+     "18",
+     "COAL_MID",
+     "min up broken",
+     "turned off after 6 h on (needs 8)"
+    ],
+    [
+     "19",
+     "PEAKER_B",
+     "min down broken",
+     "restarted after 1 h off (needs 3)"
+    ],
+    [
+     "20",
+     "PEAKER_A",
+     "min up broken",
+     "turned off after 2 h on (needs 3)"
+    ],
+    [
+     "20",
+     "PEAKER_B",
+     "min up broken",
+     "turned off after 1 h on (needs 3)"
+    ],
+    [
+     "22",
+     "PEAKER_A",
+     "min down broken",
+     "restarted after 2 h off (needs 3)"
+    ],
+    [
+     "22",
+     "PEAKER_C",
+     "min down broken",
+     "restarted after 2 h off (needs 3)"
+    ],
+    [
+     "23",
+     "PEAKER_C",
+     "min up broken",
+     "turned off after 1 h on (needs 3)"
+    ]
+   ]
+  },
+  "B": {
+   "gap": 10.50818342800218,
+   "broken": 5,
+   "kinds": {
+    "min up/down": 5
+   },
+   "startups": 16,
+   "cost": 665413.3900000001,
+   "hours": [
+    {
+     "hour": 0,
+     "A": 57445.76,
+     "max_c": 28722.88,
+     "pick": "COAL+OIL+COAL_MID+PEAKER_C+OIL_2",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 1,
+     "A": 57445.76,
+     "max_c": 28722.88,
+     "pick": "COAL+COAL_MID+PEAKER_C+OIL_2",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 2,
+     "A": 57445.76,
+     "max_c": 28722.88,
+     "pick": "COAL+COAL_MID+PEAKER_C",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 3,
+     "A": 57445.76,
+     "max_c": 28722.88,
+     "pick": "COAL+COAL_MID+PEAKER_C",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 4,
+     "A": 57445.76,
+     "max_c": 28722.88,
+     "pick": "COAL+COAL_MID+PEAKER_C+OIL_2",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 5,
+     "A": 57445.76,
+     "max_c": 28722.88,
+     "pick": "COAL+OIL+COAL_MID+PEAKER_C+OIL_2",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 6,
+     "A": 57445.76,
+     "max_c": 28722.88,
+     "pick": "COAL+PEAKER_A+PEAKER_B+OIL+COAL_MID+PEAKER_C+OIL_2",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 7,
+     "A": 57445.76,
+     "max_c": 28722.88,
+     "pick": "COAL+PEAKER_A+PEAKER_B+OIL+COAL_MID+COAL_SMALL+PEAKER_C+OIL_2",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 8,
+     "A": 57445.76,
+     "max_c": 28722.88,
+     "pick": "COAL+COAL_MID+COAL_SMALL+GAS_CC_2+PEAKER_C",
+     "hour_ok": true,
+     "locks_broken": [
+      "PEAKER_A",
+      "PEAKER_B"
+     ]
+    },
+    {
+     "hour": 9,
+     "A": 57445.76,
+     "max_c": 28722.88,
+     "pick": "COAL+OIL+COAL_MID+COAL_SMALL+GAS_CC_2+PEAKER_C+OIL_2",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 10,
+     "A": 57445.76,
+     "max_c": 28722.88,
+     "pick": "COAL+PEAKER_A+OIL+COAL_MID+COAL_SMALL+GAS_CC_2+PEAKER_C+OIL_2",
+     "hour_ok": true,
+     "locks_broken": [
+      "PEAKER_A"
+     ]
+    },
+    {
+     "hour": 11,
+     "A": 57445.76,
+     "max_c": 28722.88,
+     "pick": "COAL+GAS_CC+COAL_MID+COAL_SMALL+GAS_CC_2",
+     "hour_ok": true,
+     "locks_broken": [
+      "PEAKER_A"
+     ]
+    },
+    {
+     "hour": 12,
+     "A": 12511.2,
+     "max_c": 6255.6,
+     "pick": "COAL+GAS_CC+OIL+COAL_MID+COAL_SMALL+GAS_CC_2",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 13,
+     "A": 12511.2,
+     "max_c": 6255.6,
+     "pick": "COAL+GAS_CC+OIL+COAL_MID+COAL_SMALL+GAS_CC_2+OIL_2",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 14,
+     "A": 12511.2,
+     "max_c": 6255.6,
+     "pick": "COAL+GAS_CC+OIL+COAL_MID+COAL_SMALL+GAS_CC_2+PEAKER_C+OIL_2",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 15,
+     "A": 12511.2,
+     "max_c": 6255.6,
+     "pick": "COAL+GAS_CC+OIL+COAL_MID+COAL_SMALL+GAS_CC_2+PEAKER_C+OIL_2",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 16,
+     "A": 12511.2,
+     "max_c": 6255.6,
+     "pick": "COAL+GAS_CC+COAL_MID+COAL_SMALL+GAS_CC_2",
+     "hour_ok": true,
+     "locks_broken": [
+      "PEAKER_C"
+     ]
+    },
+    {
+     "hour": 17,
+     "A": 12511.2,
+     "max_c": 6255.6,
+     "pick": "COAL+GAS_CC+COAL_MID+GAS_CC_2",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 18,
+     "A": 29855.36,
+     "max_c": 14927.68,
+     "pick": "COAL+GAS_CC+COAL_MID+GAS_CC_2",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 19,
+     "A": 29855.36,
+     "max_c": 14927.68,
+     "pick": "COAL+GAS_CC+COAL_MID+GAS_CC_2",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 20,
+     "A": 29855.36,
+     "max_c": 14927.68,
+     "pick": "COAL+GAS_CC+GAS_CC_2",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 21,
+     "A": 44856.0,
+     "max_c": 22428.0,
+     "pick": "COAL+GAS_CC+GAS_CC_2",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 22,
+     "A": 44856.0,
+     "max_c": 22428.0,
+     "pick": "COAL+GAS_CC+GAS_CC_2",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 23,
+     "A": 44856.0,
+     "max_c": 22428.0,
+     "pick": "COAL+GAS_CC",
+     "hour_ok": true,
+     "locks_broken": []
+    }
+   ],
+   "startup_cost": 92840.0,
+   "no_load_cost": 51583.0,
+   "energy_cost": 520990.39000000013,
+   "violations": [
+    [
+     "8",
+     "PEAKER_A",
+     "min up broken",
+     "turned off after 2 h on (needs 3)"
+    ],
+    [
+     "8",
+     "PEAKER_B",
+     "min up broken",
+     "turned off after 2 h on (needs 3)"
+    ],
+    [
+     "10",
+     "PEAKER_A",
+     "min down broken",
+     "restarted after 2 h off (needs 3)"
+    ],
+    [
+     "11",
+     "PEAKER_A",
+     "min up broken",
+     "turned off after 1 h on (needs 3)"
+    ],
+    [
+     "16",
+     "PEAKER_C",
+     "min up broken",
+     "turned off after 2 h on (needs 3)"
+    ]
+   ]
+  },
+  "C": {
+   "gap": 9.840754999834225,
+   "broken": 0,
+   "kinds": {},
+   "startups": 15,
+   "cost": 661394.5400000003,
+   "hours": [
+    {
+     "hour": 0,
+     "A": 57445.76,
+     "max_c": 28722.88,
+     "pick": "COAL+OIL+COAL_MID+PEAKER_C+OIL_2",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 1,
+     "A": 57445.76,
+     "max_c": 28722.88,
+     "pick": "COAL+COAL_MID+PEAKER_C+OIL_2",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 2,
+     "A": 57445.76,
+     "max_c": 28722.88,
+     "pick": "COAL+COAL_MID+PEAKER_C",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 3,
+     "A": 57445.76,
+     "max_c": 28722.88,
+     "pick": "COAL+COAL_MID+PEAKER_C",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 4,
+     "A": 57445.76,
+     "max_c": 28722.88,
+     "pick": "COAL+COAL_MID+PEAKER_C+OIL_2",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 5,
+     "A": 57445.76,
+     "max_c": 28722.88,
+     "pick": "COAL+OIL+COAL_MID+PEAKER_C+OIL_2",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 6,
+     "A": 57445.76,
+     "max_c": 28722.88,
+     "pick": "COAL+PEAKER_A+PEAKER_B+OIL+COAL_MID+PEAKER_C+OIL_2",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 7,
+     "A": 57445.76,
+     "max_c": 28722.88,
+     "pick": "COAL+PEAKER_A+PEAKER_B+OIL+COAL_MID+COAL_SMALL+PEAKER_C+OIL_2",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 8,
+     "A": 57445.76,
+     "max_c": 28722.88,
+     "pick": "COAL+PEAKER_A+PEAKER_B+COAL_MID+COAL_SMALL+GAS_CC_2",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 9,
+     "A": 57445.76,
+     "max_c": 28722.88,
+     "pick": "COAL+PEAKER_A+PEAKER_B+OIL+COAL_MID+COAL_SMALL+GAS_CC_2",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 10,
+     "A": 57445.76,
+     "max_c": 28722.88,
+     "pick": "COAL+PEAKER_A+PEAKER_B+OIL+COAL_MID+COAL_SMALL+GAS_CC_2+OIL_2",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 11,
+     "A": 57445.76,
+     "max_c": 28722.88,
+     "pick": "COAL+GAS_CC+COAL_MID+COAL_SMALL+GAS_CC_2",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 12,
+     "A": 12511.2,
+     "max_c": 6255.6,
+     "pick": "COAL+GAS_CC+OIL+COAL_MID+COAL_SMALL+GAS_CC_2",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 13,
+     "A": 12511.2,
+     "max_c": 6255.6,
+     "pick": "COAL+GAS_CC+OIL+COAL_MID+COAL_SMALL+GAS_CC_2+OIL_2",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 14,
+     "A": 12511.2,
+     "max_c": 6255.6,
+     "pick": "COAL+GAS_CC+OIL+COAL_MID+COAL_SMALL+GAS_CC_2+PEAKER_C+OIL_2",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 15,
+     "A": 12511.2,
+     "max_c": 6255.6,
+     "pick": "COAL+GAS_CC+OIL+COAL_MID+COAL_SMALL+GAS_CC_2+PEAKER_C+OIL_2",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 16,
+     "A": 12511.2,
+     "max_c": 6255.6,
+     "pick": "COAL+GAS_CC+COAL_MID+COAL_SMALL+GAS_CC_2+PEAKER_C",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 17,
+     "A": 12511.2,
+     "max_c": 6255.6,
+     "pick": "COAL+GAS_CC+COAL_MID+GAS_CC_2",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 18,
+     "A": 29855.36,
+     "max_c": 14927.68,
+     "pick": "COAL+GAS_CC+COAL_MID+GAS_CC_2",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 19,
+     "A": 29855.36,
+     "max_c": 14927.68,
+     "pick": "COAL+GAS_CC+COAL_MID+GAS_CC_2",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 20,
+     "A": 29855.36,
+     "max_c": 14927.68,
+     "pick": "COAL+GAS_CC+GAS_CC_2",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 21,
+     "A": 44856.0,
+     "max_c": 22428.0,
+     "pick": "COAL+GAS_CC+GAS_CC_2",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 22,
+     "A": 44856.0,
+     "max_c": 22428.0,
+     "pick": "COAL+GAS_CC+GAS_CC_2",
+     "hour_ok": true,
+     "locks_broken": []
+    },
+    {
+     "hour": 23,
+     "A": 44856.0,
+     "max_c": 22428.0,
+     "pick": "COAL+GAS_CC",
+     "hour_ok": true,
+     "locks_broken": []
+    }
+   ],
+   "startup_cost": 87690.0,
+   "no_load_cost": 53182.0,
+   "energy_cost": 520522.5400000002,
+   "violations": []
+  },
+  "D": {
+   "gap": 6.663863107993901,
+   "broken": 0,
+   "kinds": {},
+   "startups": 14,
+   "cost": 642265.22,
+   "hours": [],
+   "startup_cost": 82540.0,
+   "no_load_cost": 49050.0,
+   "energy_cost": 510675.22000000003,
+   "violations": []
+  }
+ }
+}

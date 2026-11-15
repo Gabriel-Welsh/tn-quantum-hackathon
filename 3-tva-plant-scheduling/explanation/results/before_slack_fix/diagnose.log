@@ -1,0 +1,68 @@
+
+===== 5 plants (9 qubits/hour), MILP $327,924
+  A: gap  +11.82%  broken  4  {'min up/down': 4}  startups 11
+  B: gap   +6.07%  broken  3  {'min up/down': 3}  startups 6
+  C: gap   +7.06%  broken  0  {}  startups 6
+  D: gap   +7.06%  broken  0  {}  startups 6
+  A per hour (mean): P(valid choice) 0.657 vs uniform 0.342; P(QUBO min) 0.0109 vs uniform 0.0020; best sample = QUBO min in 17/24 h; hourly-rule failures 0/24 h; valid-choice energy spread after rescaling 0.3272
+  B: hourly-rule failures 0/24 h; locks broken in 2/24 h
+  hour  MILP                                  A pure QAOA                             B QUBO minimum
+     0  COAL                                  COAL                                    COAL
+     1  COAL                                  COAL+OIL                                COAL
+     2  COAL                                  COAL+PEAKER_B+OIL                       COAL
+     3  COAL                                  COAL+PEAKER_B                           COAL
+     4  COAL                                  COAL                                    COAL
+     5  COAL+GAS_CC                           COAL+PEAKER_B                           COAL+OIL
+     6  COAL+GAS_CC                           COAL+PEAKER_B+OIL                       COAL+PEAKER_A+OIL
+     7  COAL+GAS_CC                           COAL+PEAKER_A+PEAKER_B+OIL              COAL+PEAKER_A+PEAKER_B+OIL
+     8  COAL+GAS_CC                           COAL+GAS_CC                             COAL+GAS_CC
+     9  COAL+GAS_CC                           COAL+GAS_CC                             COAL+GAS_CC
+    10  COAL+GAS_CC                           COAL+GAS_CC                             COAL+GAS_CC
+    11  COAL+GAS_CC                           COAL+GAS_CC                             COAL+GAS_CC
+    12  COAL+GAS_CC+PEAKER_A                  COAL+GAS_CC+OIL                         COAL+GAS_CC+OIL
+    13  COAL+GAS_CC+PEAKER_A                  COAL+GAS_CC+OIL                         COAL+GAS_CC+OIL
+    14  COAL+GAS_CC+PEAKER_A+OIL              COAL+GAS_CC+PEAKER_A+OIL                COAL+GAS_CC+PEAKER_A+OIL
+    15  COAL+GAS_CC+PEAKER_A+OIL              COAL+GAS_CC+PEAKER_A+OIL                COAL+GAS_CC+PEAKER_A+OIL
+    16  COAL+GAS_CC                           COAL+GAS_CC                             COAL+GAS_CC
+    17  COAL+GAS_CC                           COAL+GAS_CC                             COAL+GAS_CC
+    18  COAL+GAS_CC                           COAL+GAS_CC                             COAL+GAS_CC
+    19  COAL+GAS_CC                           COAL+GAS_CC+OIL                         COAL+GAS_CC
+    20  COAL+GAS_CC                           COAL+GAS_CC                             COAL+GAS_CC
+    21  COAL+GAS_CC                           COAL+GAS_CC+OIL                         COAL+GAS_CC
+    22  COAL+GAS_CC                           COAL+GAS_CC                             COAL+GAS_CC
+    23  COAL+GAS_CC                           GAS_CC+OIL                              COAL+GAS_CC
+
+===== 10 plants (15 qubits/hour), MILP $602,139
+  A: gap  +47.29%  broken 32  {'min up/down': 32}  startups 37
+  B: gap  +10.51%  broken  5  {'min up/down': 5}  startups 16
+  C: gap   +9.84%  broken  0  {}  startups 15
+  D: gap   +6.66%  broken  0  {}  startups 14
+  A per hour (mean): P(valid choice) 0.594 vs uniform 0.318; P(QUBO min) 0.0004 vs uniform 0.0000; best sample = QUBO min in 0/24 h; hourly-rule failures 0/24 h; valid-choice energy spread after rescaling 0.3974
+  B: hourly-rule failures 0/24 h; locks broken in 4/24 h
+  hour  MILP                                  A pure QAOA                             B QUBO minimum
+     0  COAL+COAL_MID+COAL_SMALL+OIL_2        COAL+OIL+COAL_MID+GAS_CC_2+OIL_2        COAL+OIL+COAL_MID+PEAKER_C+OIL_2
+     1  COAL+COAL_MID+COAL_SMALL              COAL+PEAKER_A+PEAKER_B+OIL+COAL_MID+OIL_2COAL+COAL_MID+PEAKER_C+OIL_2
+     2  COAL+COAL_MID+COAL_SMALL              COAL+PEAKER_A+PEAKER_B+OIL+COAL_MID+OIL_2COAL+COAL_MID+PEAKER_C
+     3  COAL+COAL_MID+COAL_SMALL              COAL+PEAKER_A+COAL_MID+COAL_SMALL       COAL+COAL_MID+PEAKER_C
+     4  COAL+COAL_MID+COAL_SMALL              COAL+COAL_MID+COAL_SMALL+GAS_CC_2+OIL_2 COAL+COAL_MID+PEAKER_C+OIL_2
+     5  COAL+GAS_CC+COAL_MID+COAL_SMALL       PEAKER_A+PEAKER_B+COAL_MID+COAL_SMALL+GAS_CC_2COAL+OIL+COAL_MID+PEAKER_C+OIL_2
+     6  COAL+GAS_CC+COAL_MID+COAL_SMALL       GAS_CC+OIL+COAL_MID+GAS_CC_2            COAL+PEAKER_A+PEAKER_B+OIL+COAL_MID+PEAKER_C+OIL_2
+     7  COAL+GAS_CC+COAL_MID+COAL_SMALL       GAS_CC+PEAKER_B+OIL+COAL_SMALL+GAS_CC_2+OIL_2COAL+PEAKER_A+PEAKER_B+OIL+COAL_MID+COAL_SMALL+PEAKER_C+OIL_2
+     8  COAL+GAS_CC+COAL_MID+COAL_SMALL       GAS_CC+PEAKER_B+OIL+COAL_MID+COAL_SMALL+GAS_CC_2COAL+COAL_MID+COAL_SMALL+GAS_CC_2+PEAKER_C
+     9  COAL+GAS_CC+COAL_MID+COAL_SMALL+GAS_CC_2GAS_CC+PEAKER_A+OIL+COAL_MID+COAL_SMALL+GAS_CC_2+PEAKER_C+OIL_2COAL+OIL+COAL_MID+COAL_SMALL+GAS_CC_2+PEAKER_C+OIL_2
+    10  COAL+GAS_CC+COAL_MID+COAL_SMALL+GAS_CC_2COAL+GAS_CC+PEAKER_A+GAS_CC_2+PEAKER_C  COAL+PEAKER_A+OIL+COAL_MID+COAL_SMALL+GAS_CC_2+PEAKER_C+OIL_2
+    11  COAL+GAS_CC+COAL_MID+COAL_SMALL+GAS_CC_2COAL+GAS_CC+PEAKER_B+COAL_SMALL+GAS_CC_2+PEAKER_C+OIL_2COAL+GAS_CC+COAL_MID+COAL_SMALL+GAS_CC_2
+    12  COAL+GAS_CC+COAL_MID+COAL_SMALL+GAS_CC_2+PEAKER_CCOAL+GAS_CC+PEAKER_B+COAL_MID+COAL_SMALL+GAS_CC_2+PEAKER_CCOAL+GAS_CC+OIL+COAL_MID+COAL_SMALL+GAS_CC_2
+    13  COAL+GAS_CC+PEAKER_A+COAL_MID+COAL_SMALL+GAS_CC_2+PEAKER_CCOAL+GAS_CC+PEAKER_A+COAL_MID+COAL_SMALL+GAS_CC_2+PEAKER_C+OIL_2COAL+GAS_CC+OIL+COAL_MID+COAL_SMALL+GAS_CC_2+OIL_2
+    14  COAL+GAS_CC+PEAKER_A+OIL+COAL_MID+COAL_SMALL+GAS_CC_2+PEAKER_CCOAL+GAS_CC+PEAKER_A+OIL+COAL_MID+COAL_SMALL+GAS_CC_2+PEAKER_C+OIL_2COAL+GAS_CC+OIL+COAL_MID+COAL_SMALL+GAS_CC_2+PEAKER_C+OIL_2
+    15  COAL+GAS_CC+PEAKER_A+OIL+COAL_MID+COAL_SMALL+GAS_CC_2+PEAKER_CCOAL+GAS_CC+OIL+COAL_MID+COAL_SMALL+GAS_CC_2+PEAKER_C+OIL_2COAL+GAS_CC+OIL+COAL_MID+COAL_SMALL+GAS_CC_2+PEAKER_C+OIL_2
+    16  COAL+GAS_CC+COAL_MID+COAL_SMALL+GAS_CC_2COAL+GAS_CC+OIL+COAL_MID+COAL_SMALL+GAS_CC_2COAL+GAS_CC+COAL_MID+COAL_SMALL+GAS_CC_2
+    17  COAL+GAS_CC+COAL_MID+COAL_SMALL+GAS_CC_2COAL+GAS_CC+PEAKER_B+COAL_MID+GAS_CC_2+PEAKER_CCOAL+GAS_CC+COAL_MID+GAS_CC_2
+    18  COAL+GAS_CC+COAL_MID+COAL_SMALL+GAS_CC_2COAL+GAS_CC+PEAKER_A+GAS_CC_2+PEAKER_C  COAL+GAS_CC+COAL_MID+GAS_CC_2
+    19  COAL+GAS_CC+COAL_MID+COAL_SMALL+GAS_CC_2COAL+GAS_CC+PEAKER_A+PEAKER_B+OIL+GAS_CC_2+PEAKER_C+OIL_2COAL+GAS_CC+COAL_MID+GAS_CC_2
+    20  COAL+GAS_CC+COAL_MID+COAL_SMALL+GAS_CC_2COAL+GAS_CC+GAS_CC_2+OIL_2              COAL+GAS_CC+GAS_CC_2
+    21  COAL+GAS_CC+COAL_MID+COAL_SMALL       COAL+GAS_CC+OIL+GAS_CC_2+OIL_2          COAL+GAS_CC+GAS_CC_2
+    22  COAL+GAS_CC+COAL_MID                  COAL+GAS_CC+PEAKER_A+GAS_CC_2+PEAKER_C  COAL+GAS_CC+GAS_CC_2
+    23  COAL+GAS_CC+COAL_MID                  COAL+GAS_CC+PEAKER_A+OIL_2              COAL+GAS_CC
+
+saved results/diagnose.json   (! = fails capacity/min-output that hour)
