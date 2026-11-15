@@ -1,0 +1,58 @@
+
+=== pure ===
+pure  n= 3 seed=0 pure  qubits= 6 gap  +12.10% broken  3  (1 s)
+pure  n= 3 seed=0 rules qubits= 6 gap   +2.07% broken  0  (1 s)
+pure  n= 3 seed=1 pure  qubits= 6 gap   +3.69% broken  2  (1 s)
+pure  n= 3 seed=1 rules qubits= 6 gap   +2.07% broken  0  (1 s)
+pure  n= 3 seed=2 pure  qubits= 6 gap   +3.69% broken  2  (1 s)
+pure  n= 3 seed=2 rules qubits= 6 gap   +2.07% broken  0  (1 s)
+saved /home/jovyan/tn-quantum-hackathon/3-tva-plant-scheduling/explanation/results/pure.json
+pure  n= 4 seed=0 pure  qubits= 7 gap   +1.53% broken  1  (1 s)
+pure  n= 4 seed=0 rules qubits= 7 gap   +1.91% broken  0  (1 s)
+pure  n= 4 seed=1 pure  qubits= 7 gap   +5.46% broken  3  (1 s)
+pure  n= 4 seed=1 rules qubits= 7 gap   +1.91% broken  0  (1 s)
+pure  n= 4 seed=2 pure  qubits= 7 gap   +3.58% broken  2  (1 s)
+pure  n= 4 seed=2 rules qubits= 7 gap   +1.91% broken  0  (1 s)
+saved /home/jovyan/tn-quantum-hackathon/3-tva-plant-scheduling/explanation/results/pure.json
+pure  n= 5 seed=0 pure  qubits= 8 gap  +10.14% broken  5  (2 s)
+pure  n= 5 seed=0 rules qubits= 8 gap   +7.06% broken  0  (2 s)
+pure  n= 5 seed=1 pure  qubits= 8 gap   +6.21% broken  2  (2 s)
+pure  n= 5 seed=1 rules qubits= 8 gap   +7.06% broken  0  (2 s)
+pure  n= 5 seed=2 pure  qubits= 8 gap  +10.12% broken  2  (2 s)
+pure  n= 5 seed=2 rules qubits= 8 gap   +7.06% broken  0  (2 s)
+saved /home/jovyan/tn-quantum-hackathon/3-tva-plant-scheduling/explanation/results/pure.json
+pure  n= 6 seed=0 pure  qubits= 9 gap  +26.26% broken 10  (2 s)
+pure  n= 6 seed=0 rules qubits= 9 gap   +5.36% broken  0  (2 s)
+pure  n= 6 seed=1 pure  qubits= 9 gap  +25.01% broken 10  (2 s)
+pure  n= 6 seed=1 rules qubits= 9 gap   +5.36% broken  0  (2 s)
+pure  n= 6 seed=2 pure  qubits= 9 gap  +30.59% broken  8  (2 s)
+pure  n= 6 seed=2 rules qubits= 9 gap   +5.36% broken  0  (2 s)
+saved /home/jovyan/tn-quantum-hackathon/3-tva-plant-scheduling/explanation/results/pure.json
+pure  n= 7 seed=0 pure  qubits=10 gap  +17.53% broken  8  (2 s)
+pure  n= 7 seed=0 rules qubits=10 gap   +4.72% broken  0  (2 s)
+pure  n= 7 seed=1 pure  qubits=10 gap  +20.60% broken  5  (2 s)
+pure  n= 7 seed=1 rules qubits=10 gap   +4.72% broken  0  (3 s)
+pure  n= 7 seed=2 pure  qubits=10 gap  +28.89% broken 11  (2 s)
+pure  n= 7 seed=2 rules qubits=10 gap   +4.72% broken  0  (2 s)
+saved /home/jovyan/tn-quantum-hackathon/3-tva-plant-scheduling/explanation/results/pure.json
+pure  n= 8 seed=0 pure  qubits=11 gap  +20.33% broken 11  (3 s)
+pure  n= 8 seed=0 rules qubits=11 gap   +6.26% broken  0  (3 s)
+pure  n= 8 seed=1 pure  qubits=11 gap  +23.70% broken 13  (3 s)
+pure  n= 8 seed=1 rules qubits=11 gap   +6.26% broken  0  (3 s)
+pure  n= 8 seed=2 pure  qubits=11 gap  +26.12% broken 17  (3 s)
+pure  n= 8 seed=2 rules qubits=11 gap   +6.26% broken  0  (3 s)
+saved /home/jovyan/tn-quantum-hackathon/3-tva-plant-scheduling/explanation/results/pure.json
+pure  n= 9 seed=0 pure  qubits=12 gap  +31.79% broken 23  (4 s)
+pure  n= 9 seed=0 rules qubits=12 gap   +5.07% broken  0  (5 s)
+pure  n= 9 seed=1 pure  qubits=12 gap  +30.32% broken 18  (4 s)
+pure  n= 9 seed=1 rules qubits=12 gap   +5.07% broken  0  (5 s)
+pure  n= 9 seed=2 pure  qubits=12 gap  +28.16% broken 16  (4 s)
+pure  n= 9 seed=2 rules qubits=12 gap   +5.07% broken  0  (5 s)
+saved /home/jovyan/tn-quantum-hackathon/3-tva-plant-scheduling/explanation/results/pure.json
+pure  n=10 seed=0 pure  qubits=13 gap  +30.05% broken 13  (6 s)
+pure  n=10 seed=0 rules qubits=13 gap   +7.99% broken  0  (7 s)
+pure  n=10 seed=1 pure  qubits=13 gap  +23.47% broken 12  (6 s)
+pure  n=10 seed=1 rules qubits=13 gap   +8.08% broken  0  (7 s)
+pure  n=10 seed=2 pure  qubits=13 gap  +26.10% broken 13  (6 s)
+pure  n=10 seed=2 rules qubits=13 gap   +9.04% broken  0  (6 s)
+saved /home/jovyan/tn-quantum-hackathon/3-tva-plant-scheduling/explanation/results/pure.json

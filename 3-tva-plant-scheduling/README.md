@@ -148,7 +148,7 @@ A team that shows where its hybrid approach lost cost or broke a rule, and expla
 | File | What it is |
 |---|---|
 | `README.md` | This page |
-| `notebooks/` | Starter, primer, improvements, and hybrid interface notebooks |
+| `notebooks/` | Starter, primer, improvements, hybrid interface, and [warm-start benchmark](./notebooks/warm_start_vs_milp.ipynb) notebooks |
 | `scheduling/` | Checker, MILP baseline, QAOA schedulers, and warm-start script |
 | `data/` | Plants, demand, source and license notes |
 | `background/` | TVA's original problem, its two background documents, and what changed for this event |
@@ -157,7 +157,7 @@ A team that shows where its hybrid approach lost cost or broke a rule, and expla
 | `experiments/` | Additional scheduling experiments and their reports |
 | `hybrid_uc/` | Hybrid unit-commitment package and analysis |
 | `input_app/` | Plant and demand editor with scheduling UI |
-| `outputs/` | Saved example schedules and chart |
+| `outputs/` | Saved example schedules, chart, and warm-start hardware job records |
 
 ## Links
 
