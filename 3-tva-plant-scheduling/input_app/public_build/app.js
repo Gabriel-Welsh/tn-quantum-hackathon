@@ -640,7 +640,7 @@ function showSchedule(report) {
     : "Schedule generated. No issues found by the demo checks.";
 }
 const DESCRIPTIONS = {
-  stable: "Keeps plants on or off for their minimum run times after a change during the day, then fills demand by a cost ranking.",
+  stable: "Uses minimum on/off time rules that also appear in the full MILP, then fills demand by a cost ranking. This browser heuristic does not run a MILP solver.",
   cheap: "Ranks plants by (marginal cost + no-load cost) divided by maximum MW, separately for every hour. It may break operating rules.",
   qaoa: "Classically simulates a one-layer QAOA circuit and 512 measurement shots per hour (up to 10 plants). Results can vary between runs. This is not the QAOA run we did on an actual quantum computer.",
 };

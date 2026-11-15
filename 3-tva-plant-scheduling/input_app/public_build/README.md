@@ -57,7 +57,7 @@ Keep the terminal open and the laptop awake. Some Wi-Fi networks block connectio
 
 - Edit up to 40 plants, import and download plant CSVs, and restore the ten-plant example.
 - Change 24 hourly demand values and one reserve percentage.
-- Generate a schedule with **Stable heuristic**, **Cheapest-first**, or **QAOA simulated in the browser** (up to 10 plants).
+- Generate a schedule with **Stable heuristic**, **Cheapest-first**, or **QAOA simulated in the browser** (up to 10 plants). The stable heuristic follows some operating rules used in the full MILP but does not solve a MILP.
 - Inspect an accessible chart and exact-value table for each schedule.
 - See two published local HiGHS benchmark charts, each backed by a data table.
 
@@ -66,6 +66,8 @@ Plant and demand edits apply only after their **Apply** button is pressed. Appli
 ## Scientific scope
 
 The public copy preserves the educational workflow of the Python app while running entirely in a browser. Its QAOA option simulates a one-layer circuit and 512 measurement shots on a classical computer, one hour at a time, for fleets of at most 10 plants. It selects the lowest-cost feasible sampled state when one is found; results can vary between runs. This uses a simpler cost model than the Python QAOA solver and omits that solver's slack bits, look-ahead, and local search. **It is not the QAOA run we did on an actual quantum computer.** The public copy does not run the original exact MILP or submit qBraid hardware jobs. All three scheduling rules are teaching examples. The cost is a simplified dispatch estimate; ramp limits are not checked. Results from edited data are not research results or an optimality claim. The two report charts show fixed, published local HiGHS medians and do not change with visitor inputs.
+
+The Results page explains the research workflow: QAOA proposed small-fleet schedules, classical checks repaired a candidate, and the candidate warm-started the full HiGHS MILP. Larger cases used simulated annealing for the proposal. The published charts compare only the HiGHS solve stage, so their small warm-start improvements do not establish a faster end-to-end hybrid run.
 
 ## Accessibility and maintenance
 
