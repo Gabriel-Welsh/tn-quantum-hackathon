@@ -1,10 +1,10 @@
 # Speaking script: Quantum warm start for TVA plant scheduling
 
 **Length:** about 9–10 minutes, plus questions. Each part has a suggested speaker time.
-**What to have open:** `TVA_quantum_warm_start.ipynb` (already run, outputs saved), scrolled to the top.
+**What to have open:** `explanation/TVA_quantum_warm_start.ipynb` (already run, outputs saved), scrolled to the top.
 **How to read this script:** plain text is what you say. Lines starting with **[SHOW]** tell you what to put on screen. Lines starting with **[CHECK IT]** tell the audience (or a judge) where to verify the number themselves.
 
-Every number in this script comes from the saved run of `TVA_quantum_warm_start.ipynb`, or from `explanation/results/*.json` for the history part. If you re-run the notebook, millisecond timings will change slightly. Costs and counts will not.
+Every number in this script comes from the saved run of `explanation/TVA_quantum_warm_start.ipynb`, or from `explanation/results/*.json` for the history part. If you re-run the notebook, millisecond timings will change slightly. Costs and counts will not.
 
 ---
 
@@ -192,7 +192,7 @@ Pure QAOA scaled badly (+48%, 28 rules broken at 10 plants). Our block QUBO's be
 
 | What | Where |
 |---|---|
-| The whole story, runnable, with outputs | `TVA_quantum_warm_start.ipynb` (sections 1–10) |
+| The whole story, runnable, with outputs | `explanation/TVA_quantum_warm_start.ipynb` (sections 1–10) |
 | Deeper comparison: shots-vs-seeds sweep, 10-plant case, random-start control | `warm_start_vs_milp.ipynb` |
 | The pipeline code | `quantum_warm_start_milp.py` (`Qubo`, `solve_qaoa`, `repair`, `full_solution`, `run_highs`) |
 | Plain-language explanation of the pipeline | `QUANTUM_WARM_START.md` |
