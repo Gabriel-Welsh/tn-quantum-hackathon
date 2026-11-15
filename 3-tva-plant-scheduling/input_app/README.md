@@ -8,6 +8,12 @@
    python server.py
    ```
 
+   The **Quantum warm-start MILP** option also needs `highspy`. On this Lab
+   instance it is installed in the qBraid-SDK environment, so start the app
+   with that environment's Python to use this option. Find its path with
+   `qbraid envs list`, then run `<env-path>/pyenv/bin/python server.py`.
+   Other app algorithms continue to work without `highspy`.
+
 2. In another Lab terminal, open it in Agent Canvas:
 
    ```bash
@@ -37,17 +43,8 @@ The app has four pages:
   invalid schedule. Its QAOA option uses a local statevector simulator, **not an
   actual quantum computer**. The Quantum computing outlook is developer-maintained
   text in `index.html`; visitors cannot edit it.
-- **Quantum hardware report**: a developer-maintained study template with an
-  empty MILP versus QAOA–MILP runtime graph and an empty QPU bitstring graph.
-  It shows measured charts only after their CSVs are supplied and processed.
-  The app never submits a QPU job or claims a hybrid speedup without data.
-
-To populate either graph, follow [HARDWARE_REPORT_TEMPLATE.md](HARDWARE_REPORT_TEMPLATE.md),
-copy the corresponding header-only example CSV, add measured rows, run
-`Rscript hardware_report.R` from `input_app/`, and refresh the browser. The R
-script writes `runtime-comparison.svg` and/or `hardware-histogram.svg` only
-when their inputs are present and valid. Verify any claimed QPU run against its
-device and job IDs.
+- **Quantum hardware report**: charts the existing local HiGHS solve-time and
+  primal-dual-integral medians from the warm-start experiments.
 
 ## Add a scheduling algorithm
 
@@ -95,6 +92,14 @@ credit, and local search. **QAOA credit: Gabe.** It requires Qiskit in the
 server's Python environment and does not submit hardware jobs or spend QPU
 credits. The web app limits local QAOA to 13 plants to keep statevector runs
 responsive.
+
+`quantum_warm_start.py` wraps the project's `quantum_warm_start_milp.py`: a
+small, locally simulated QAOA proposes block-level on/off decisions, classical
+repair turns the best candidate into a feasible full-day MILP starting
+solution, and HiGHS solves the MILP. It uses the saved editor CSVs and does not
+submit QPU jobs. The webapp caps the local QUBO at 16 bits for responsiveness;
+this selector reports the final schedule, not a cold-versus-warm speedup test.
+See `../QUANTUM_WARM_START.md` for the benchmark script and its limits.
 
 The source examples in `data/` stay unchanged. To use the edited files in a
 notebook or Python script run from this project folder:

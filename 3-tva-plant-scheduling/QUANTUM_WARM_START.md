@@ -267,7 +267,9 @@ Qiskit and qiskit-aer are optional. Without them, QAOA samples from the numpy si
 | `--maxiter` | 60 | QAOA optimizer steps for training the angles |
 | `--shots` | 4000 | QAOA measurements |
 | `--alpha` | 0.25 | CVaR fraction for training (1 = plain average energy) |
-| `--sampler` | auto | `qiskit` (Aer circuit), `numpy` (statevector) or `auto` (Qiskit if installed) |
+| `--sampler` | auto | `qiskit` (Aer circuit), `numpy` (statevector), `auto` (Qiskit if installed), or `qbraid` (a real QPU or cloud simulator, see section 4b) |
+| `--device` | `qbraid:qbraid:sim:qir-sv` | qBraid device id used with `--sampler qbraid` |
+| `--max-credits` | 0 | Largest estimated cost (qBraid credits, 100 = $1) the script may spend on the device run. 0 means free devices only |
 | `--penalty` | 1.0 | Weight of the capacity penalty in the QUBO |
 | `--candidates` | 50 | How many of the best samples to repair and score |
 | `--time-limit` | 60 | HiGHS time limit per run, in seconds |
@@ -303,6 +305,60 @@ Below the table: how far the warm start was from the best cost found (in %), the
 
 ---
 
+## 4b. Running on a real quantum computer
+
+### What "training" means here
+
+QAOA has a few dials, the angles γ (gamma) and β (beta): two per layer, so 2 numbers for `--p 1`. The circuit's *shape* comes from the QUBO. The angles decide how strongly each layer pushes the probability toward cheap schedules. Training means finding the angle values that make the circuit output cheap schedules most often.
+
+1. Pick some angles. The start is a "linear ramp".
+2. Run the circuit and score it by the average energy of its best 25% of outcomes (CVaR, `--alpha`).
+3. A classical optimizer (COBYLA) nudges the angles and repeats, up to `--maxiter` (60) times.
+
+This is the "variational" loop used by all near-term quantum algorithms. A classical computer turns the dials while the quantum circuit is evaluated. **In this script the loop runs on the exact simulator**, because doing it on hardware would mean about 60 separate paid jobs. Only the **final** circuit, with the trained angles fixed, is sent to the device once, and its measured bitstrings are used. The angles are just numbers, so angles trained on a simulator work on hardware. Noise makes the result somewhat worse than predicted.
+
+### How to run it
+
+```bash
+# free: qBraid's cloud statevector simulator (full pipeline, real job submission)
+python quantum_warm_start_milp.py --sampler qbraid --p 1 --shots 1000
+
+# real QPU: IonQ Forte through AWS, 200 shots (about 1,630 credits = $16.30 at current prices)
+python quantum_warm_start_milp.py --sampler qbraid --device aws:ionq:qpu:forte-1 --p 1 --shots 200 --max-credits 1700
+```
+
+What happens inside `sample_on_qbraid`:
+
+1. It looks up the device and checks that it is ONLINE and has enough qubits.
+2. **Cost guard.** It estimates the cost from the device's price list (per task + per shot × shots) and prints it. It refuses to submit if the estimate is above `--max-credits`. The default is 0, so only free devices run unless you opt in. Devices priced per minute (e.g. Rigetti) always need an explicit `--max-credits`, because their time can't be known in advance.
+3. It rewrites the circuit in plain gates every provider accepts (H, RX, RZ, CX; each RZZ becomes CX-RZ-CX).
+4. It submits one job, prints the job id (you can watch it in the **Quantum Jobs** panel), waits for the result, and reads the counts. Bit order is the same as Qiskit's, qubit 0 rightmost, as checked with a test circuit.
+5. The counts go into the same repair → HiGHS steps as before.
+
+### Choosing a device
+
+| Device | Price (credits) | Notes |
+|---|---|---|
+| `qbraid:qbraid:sim:qir-sv` | free | Noise-free cloud simulator. Use it to test everything first |
+| `aws:ionq:qpu:forte-1` | 30 per task + 8 per shot | Trapped ions, all-to-all connections, a good fit because the QUBO pairs aren't neighbours |
+| `rigetti:rigetti:qpu:cepheus-1-108q` | 12,000 per minute | Superconducting. Needs SWAPs for non-neighbour pairs, so the circuit gets deeper |
+| IBM (`ibm:ibm:qpu:...`) | your IBM plan | Needs your own IBM token in the Vault; jobs go straight to IBM |
+
+Prices change, so check with `qbraid devices get <id>` and `qbraid account credits` before a paid run.
+
+Circuit size for 5 plants: `--blocks 4 --p 1` is 20 qubits and 55 RZZ (110 CX). `--blocks 2 --p 1` is 10 qubits and 25 RZZ. Shorter circuits suffer less from noise.
+
+### Tested on qBraid's free cloud simulator
+
+`python quantum_warm_start_milp.py --sampler qbraid --p 1 --shots 1000` submitted a real job, `qbraid:qbraid:sim:qir-sv-842a-qjob-6af8d9fdc8f5265fb3f20b87`. The circuit had 20 qubits, 110 CX gates and depth 49, and cost 0 credits.
+
+- 1000 shots gave 990 distinct bitstrings. The QUBO's best bitstring appeared in 0.1% of shots, against 0.0001% by chance.
+- All 50 of the top 50 samples could be repaired. The warm start cost $331,596, +1.12% from the optimum of $327,924.
+- HiGHS: 1 node in both runs, P-D integral 0.0150 → 0.0122.
+- The run took about 8 minutes, mostly waiting in the cloud queue.
+
+The paid-device cost guard was also tested: for `aws:ionq:qpu:forte-1` with 200 shots it printed "estimated cost 1,630 credits ($16.30)" and refused to submit without `--max-credits`.
+
 ## 5. Honest caveats
 
 - **The quantum step is simulated on a normal computer.** Its wall-clock time is simulation time, not QPU time, and the two cannot be compared. Training also scores all 2^N bitstrings classically, which a real QPU run would not do. Report HiGHS's time separately from the quantum step.
@@ -310,7 +366,7 @@ Below the table: how far the warm start was from the best cost found (in %), the
 - **For larger fleets the "quantum" step is simulated annealing,** because the QUBO is too big to simulate as QAOA. Say clearly which solver produced each result.
 - **The QUBO is an approximation.** Blocks force a plant to stay on or off for a whole block, the running cost assumes a typical output level, and min up/down rules are left out. That is fine. The QUBO only has to point in the right direction: repair makes the schedule legal, and HiGHS guarantees that the final answer is exact and optimal, whatever the start. A bad start can waste a little time but cannot make the final answer wrong.
 - **A warm start mainly helps the "find a good answer" half.** HiGHS still has to prove no better answer exists, and that work only gets smaller if pruning improves.
-- **Running on real hardware via qBraid** would mean sending the circuit from `qaoa_circuit` (with trained angles) to a device such as `ionq:ionq:qpu:forte-1` through `QbraidProvider`, and feeding its measured bitstrings into the same repair → HiGHS steps. Two cautions: (1) a 20-qubit, p = 2 circuit with all-to-all pair terms has far more two-qubit gates than IonQ's advice of a few dozen, so use fewer blocks and `p = 1`; (2) hardware runs cost credits and queue time. Tune on Aer and IonQ's free noisy simulator first, estimate the cost, and confirm with the team before any paid run. Hardware shot counts should be far below the 4000 used on the simulator.
+- **Real hardware is noisy.** On a QPU, the samples will be worse than on the simulator. That's fine for this pipeline: repair still makes them legal and HiGHS still returns the exact optimum. Use `--p 1` (and fewer `--blocks` if you can) to keep the circuit short. See section 4b.
 
 ---
 

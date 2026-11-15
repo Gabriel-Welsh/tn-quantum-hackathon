@@ -22,6 +22,9 @@ Usage (qBraid-SDK kernel's Python; needs numpy, scipy, highspy, optionally qiski
   python quantum_warm_start_milp.py --plants data/plants10.csv --demand data/demand10.csv --blocks 2
   python quantum_warm_start_milp.py --copies 8 --solver anneal     # 40 plants, 160-bit QUBO (bigger MILP)
   python quantum_warm_start_milp.py --selftest                     # check the pieces against each other
+  python quantum_warm_start_milp.py --sampler qbraid --p 1 --shots 1000            # free qBraid cloud simulator
+  python quantum_warm_start_milp.py --sampler qbraid --device aws:ionq:qpu:forte-1 --p 1 --shots 200 \
+         --max-credits 1700                                        # real IonQ QPU, ~1,630 credits (~$16)
 """
 import argparse
 import csv
@@ -466,7 +469,45 @@ def qaoa_circuit(qubo, Ehat_scale, Ehat_shift, gammas, betas):
     return qc
 
 
-def solve_qaoa(qubo, p=2, shots=4000, alpha=0.25, maxiter=60, seed=0, sampler="auto", log=print):
+def sample_on_qbraid(qc, device_id, shots, max_credits=0.0, timeout=3600, log=print):
+    """Run the (already measured) circuit once on a qBraid device: real QPU or cloud simulator.
+
+    Safety: the cost is estimated from the device's price list first, and the job is only submitted if the
+    estimate is within `max_credits` (default 0 = free devices only). 100 qBraid credits = 1 USD.
+    Returns {integer bitstring: count} in the same bit order as the Aer path (qubit 0 = rightmost).
+    """
+    from qbraid.runtime import QbraidProvider
+    from qiskit import transpile
+    device = QbraidProvider().get_device(device_id)
+    status = str(device.status())
+    if "ONLINE" not in status:
+        raise RuntimeError(f"{device_id} is {status}; pick an ONLINE device (qbraid devices list --status ONLINE)")
+    prof = device.profile
+    if prof.num_qubits is not None and prof.num_qubits < qc.num_qubits:
+        raise RuntimeError(f"{device_id} has {prof.num_qubits} qubits, the circuit needs {qc.num_qubits}")
+    price = prof.pricing
+    per_task = float(price.perTask) if price else 0.0
+    per_shot = float(price.perShot) if price else 0.0
+    per_min = float(price.perMinute) if price else 0.0
+    estimate = per_task + per_shot * shots
+    note = f" + {per_min:g} credits per minute of device time" if per_min else ""
+    log(f"  {device_id}: estimated cost {estimate:,.0f} credits (${estimate / 100:,.2f}){note}")
+    if estimate > max_credits or (per_min and max_credits <= 0):
+        raise RuntimeError(f"Not submitted: the estimate is above --max-credits {max_credits:g}. Re-run with "
+                           f"--max-credits <limit> once you've agreed to the cost.")
+    # plain gates every provider understands (RZZ -> CX, RZ, CX)
+    qc = transpile(qc, basis_gates=["h", "rx", "rz", "cx"], optimization_level=1)
+    log(f"  submitting {qc.num_qubits} qubits, {qc.count_ops().get('cx', 0)} CX gates, depth {qc.depth()}, "
+        f"{shots} shots ...")
+    job = device.run(qc, shots=shots)
+    log(f"  job id {job.id} (also visible in the Quantum Jobs panel); waiting up to {timeout} s")
+    job.wait_for_final_state(timeout=timeout)
+    counts = job.result().data.get_counts()
+    return {int(b.replace(" ", ""), 2): int(c) for b, c in counts.items()}
+
+
+def solve_qaoa(qubo, p=2, shots=4000, alpha=0.25, maxiter=60, seed=0, sampler="auto", device=None,
+               max_credits=0.0, log=print):
     """Train QAOA angles on a simulated statevector, then sample bitstrings (Qiskit circuit if available).
 
     `maxiter` caps the COBYLA angle search (each step = one statevector simulation, ~0.5 s at 20 qubits);
@@ -503,6 +544,13 @@ def solve_qaoa(qubo, p=2, shots=4000, alpha=0.25, maxiter=60, seed=0, sampler="a
     rng = np.random.default_rng(seed)
     used = "numpy statevector"
     samples = None
+    if sampler == "qbraid":
+        from qiskit import QuantumCircuit  # noqa: F401  (fail early if qiskit is missing)
+        qc = qaoa_circuit(qubo, scale, shift, gammas, betas)
+        qc.measure_all()
+        samples = sample_on_qbraid(qc, device, shots, max_credits, log=log)
+        shots = sum(samples.values())
+        used = f"qBraid device {device}"
     if sampler in ("auto", "qiskit"):
         try:
             from qiskit import transpile
@@ -633,7 +681,12 @@ def main():
     ap.add_argument("--shots", type=int, default=4000)
     ap.add_argument("--maxiter", type=int, default=60, help="QAOA optimizer steps (angle training)")
     ap.add_argument("--alpha", type=float, default=0.25, help="QAOA CVaR fraction (1 = plain average)")
-    ap.add_argument("--sampler", choices=["auto", "qiskit", "numpy"], default="auto")
+    ap.add_argument("--sampler", choices=["auto", "qiskit", "numpy", "qbraid"], default="auto",
+                    help="where the trained circuit is measured; qbraid = a real device or cloud simulator")
+    ap.add_argument("--device", default="qbraid:qbraid:sim:qir-sv",
+                    help="qBraid device id for --sampler qbraid (qbraid devices list --status ONLINE)")
+    ap.add_argument("--max-credits", type=float, default=0.0,
+                    help="largest estimated cost (qBraid credits, 100 = $1) allowed for the device run")
     ap.add_argument("--penalty", type=float, default=1.0, help="weight of the capacity penalty in the QUBO")
     ap.add_argument("--candidates", type=int, default=50, help="how many best samples to repair and score")
     ap.add_argument("--time-limit", type=float, default=60.0, help="HiGHS time limit per run (s)")
@@ -668,7 +721,7 @@ def main():
     print(f"\nStep 1. QUBO: {K} blocks {[f'{h[0]}-{h[-1]}' for h in blocks]} -> {qubo.N} bits, solver {solver}")
     if solver == "qaoa":
         cands, q_secs = solve_qaoa(qubo, p=a.p, shots=a.shots, alpha=a.alpha, maxiter=a.maxiter, seed=a.seed,
-                                  sampler=a.sampler)
+                                  sampler=a.sampler, device=a.device, max_credits=a.max_credits)
     elif solver == "anneal":
         cands, q_secs = solve_anneal(qubo, seed=a.seed)
     else:
@@ -732,8 +785,9 @@ def main():
         print(f"  HiGHS time    cold {c['seconds']:.3f} s -> warm {w['seconds']:.3f} s "
               f"({c['seconds'] / max(w['seconds'], 1e-9):.2f}x)")
         print(f"  B&B nodes     cold {c['nodes']:.0f} -> warm {w['nodes']:.0f}")
-        print(f"  quantum step  {q_secs:.2f} s on a classical simulator (not comparable to QPU time), "
-              f"repair {r_secs:.2f} s")
+        where = ("including the cloud queue and device time" if a.sampler == "qbraid"
+                 else "on a classical simulator (not comparable to QPU time)")
+        print(f"  quantum step  {q_secs:.2f} s {where}, repair {r_secs:.2f} s")
     if a.out:
         res = {"plants": n, "hours": T, "qubits": qubo.N, "solver": solver, "blocks": blocks,
                "warm_start_cost": best_cost if start is not None else None, "best_cost": opt,
