@@ -7,7 +7,7 @@ This folder explains our path through the TVA plant-scheduling problem in four s
 3. We grouped hours together, up to one QUBO for the whole day.
 4. We gave up on QAOA *replacing* the MILP and used it to *warm-start* the MILP instead.
 
-Every number below comes from `results/*.json`. Every figure comes from `make_figures.py`. Every experiment was re-run with `run_experiments.py`, which only *calls* the project's existing code (`check.py`, `run_qaoa_schedule.py`, `block_qubo.py`, `run_all_24h_qaoa_schedule.py`, `quantum_warm_start_milp.py`) and changes none of it.
+Every number below comes from `results/*.json`. Every figure comes from `make_figures.py`. Every experiment was re-run with `run_experiments.py`, which only *calls* the project's existing code in `../scheduling/` (`check.py`, `run_qaoa_schedule.py`, `block_qubo.py`, `run_all_24h_qaoa_schedule.py`, `quantum_warm_start_milp.py`) and changes none of it.
 
 **Everything quantum here is simulated** on an exact statevector on this Lab instance. No jobs were submitted and no credits were used.
 
@@ -33,10 +33,35 @@ The warm-start experiment needs bigger MILPs, so it uses `quantum_warm_start_mil
 | Gap vs MILP (mean of 3 seeds) | +17.8% | +3.3% | +10.1% | +29.7% | +39.3% | +46.5% | +41.4% | **+48.1%** |
 | Rules broken per day | 9.7 | 2.0 | 2.7 | 12.3 | 16.3 | 22.0 | 22.0 | **28.0** |
 
-**What it shows:** as the fleet grows, pure QAOA's schedules get both more expensive and less valid. Two reasons, both diagnosed in `../qaoa_improvements.ipynb`:
+**What it shows:** as the fleet grows, pure QAOA's schedules get both more expensive and less valid. The next section explains why.
 
-- The capacity penalty dominates the energy, so QAOA learns "have enough capacity" much better than "be cheap".
-- One hour at a time, it cannot see the min up/down rules or a startup that pays off later.
+> **Not the 13.8% from the starter.** The +13.80% in `../notebooks/starter.ipynb` (and every commit that contains it) is the **cheapest-first rule on the 5-plant fleet** ($373,168 vs $327,924). It isn't a QAOA result and it isn't for 10 plants. The comparable starter number for QAOA is the hour-by-hour loop's **+7.06%** on 5 plants. That loop already includes the min up/down locks and the valid-only pick, so it is "rule checking" in our terms (section 2), not pure QAOA.
+
+### 1b. Why pure QAOA breaks so many rules — `figures/08_why_pure_qaoa_breaks_rules.png`
+
+`diagnose_pure_qaoa.py` runs the same hour-by-hour loop four ways (seed 0), to separate the QUBO's own flaws from QAOA's sampling:
+
+| 10 plants | Gap | Rules broken | Startups | Startup cost |
+|---|---|---|---|---|
+| MILP optimum | 0% | 0 | 7 | $76,610 |
+| **A** pure QAOA (200 shots, best-energy sample) | **+47.3%** | **32** | **37** | **$278,940** |
+| **B** exact minimum of the same one-hour QUBO (a perfect QAOA) | +10.5% | 5 | 16 | $92,840 |
+| **C** B + min up/down lock penalties | +9.8% | 0 | 15 | — |
+| **D** full rule checking (section 2) | +6.7% | 0 | 14 | — |
+
+On 5 plants the same run gives A +11.8% with 4 broken, B +6.1% with 3 broken, and C = D = +7.06%, which is the starter's number.
+
+What the runs show:
+
+1. **Every broken rule is a min up/down rule.** Capacity, reserve and minimum output never fail: 0 of 24 hours in A or B. The capacity penalty works.
+2. **The one-hour QUBO has no min up/down terms at all.** Each hour's QUBO knows only that hour's costs and capacity, plus "who was on last hour" (through the startup cost). It can't know that GAS_CC_2, started an hour ago, must stay on 8 hours, or that COAL can't restart for 48 hours once switched off. So even the QUBO's *exact* minimum (B) breaks 5 rules. Adding the lock penalties (C) brings that to 0. This flaw is in the formulation, not in QAOA.
+3. **QAOA's sampling turns that flaw into chaos as plants are added.** That is the gap between A and B, and it explains the jump from 10% to 48%.
+   - The search space doubles with every plant: 2^9 = 512 bitstrings per hour at 5 plants, 2^15 = 32,768 at 10. The shots stay at 200, so at 10 plants they see under 1% of the bitstrings.
+   - At 10 plants the best sample was the QUBO's minimum in **0 of 24 hours** (17 of 24 at 5 plants). QAOA does concentrate probability: 59% of it sits on hour-valid choices, against 32% for uniform guessing. But there are about 10,000 hour-valid bitstrings (roughly 300 of the 1,024 on/off choices, before slack qubits), and its best sample lands on a different, near-tied one each hour.
+   - Nothing ties consecutive hours together, so plants flip on and off from hour to hour (37 startups against the MILP's 7). Each flip pays a startup, and each short run or quick restart breaks a min up/down rule, for example GAS_CC_2 "turned off after 1 h on (needs 8)".
+4. **Startups are where the money goes.** At 10 plants, $202k of pure QAOA's $285k excess cost over the MILP (71%) is startup cost. The rest is the extra no-load and energy cost of running the wrong mix.
+
+**In short:** the one-hour QUBO can't express min up/down times. Pure QAOA's sampling covers a shrinking fraction of a search space that doubles with every plant, so its pick wanders between hours, and every wander costs a startup and risks a min up/down violation. That is why pure QAOA's gap grows with plant count while the rule-checked version (section 2) stays around 5–7%.
 
 ---
 
@@ -96,7 +121,7 @@ Counts come from the project's own QUBO builders, with no solving involved.
 | K = 12 blocks | 21 | 63 | 178 | 207 |
 | Full 24-hour QUBO | 279 | 377 | 605 | 701 |
 
-**How to read it:** each plant adds a fixed number of qubits *per time step*. So qubits grow with plants × time steps, about linearly in each. What explodes is the **search space**: a QAOA circuit on q qubits works over all 2^q bitstrings at once, so every extra plant multiplies the state space by 2^(time steps). The full day for 10 plants is 2^701 ≈ 10^211 bitstrings. Exact simulation stops near 20–30 qubits (2^30 amplitudes is a 16 GB statevector). Today's QPUs can't run hundreds of high-quality qubits with the very many two-qubit gates these QUBOs need: even the 5-plant, 2-block QUBO in `../QUANTUM_WARM_START.md` §4b already has 25 RZZ gates per layer. Block counts can dip, as from 5 to 6 plants at K=2, because presolve fixes bits no valid schedule can change.
+**How to read it:** each plant adds a fixed number of qubits *per time step*. So qubits grow with plants × time steps, about linearly in each. What explodes is the **search space**: a QAOA circuit on q qubits works over all 2^q bitstrings at once, so every extra plant multiplies the state space by 2^(time steps). The full day for 10 plants is 2^701 ≈ 10^211 bitstrings. Exact simulation stops near 20–30 qubits (2^30 amplitudes is a 16 GB statevector). Today's QPUs can't run hundreds of high-quality qubits with the very many two-qubit gates these QUBOs need: even the 5-plant, 2-block QUBO in `../docs/QUANTUM_WARM_START.md` §4b already has 25 RZZ gates per layer. Block counts can dip, as from 5 to 6 plants at K=2, because presolve fixes bits no valid schedule can change.
 
 **The dilemma:** the formulations that give good schedules (whole day, many blocks) need the most qubits, and the ones that fit on a quantum computer (one hour, two blocks) leave the biggest gaps.
 
@@ -104,7 +129,7 @@ Counts come from the project's own QUBO builders, with no solving involved.
 
 ## 5. Why we ended up warm-starting the MILP — `figures/05_warm_start_timeline.png`, `figures/06_warm_start_metrics.png`
 
-Steps 1–4 point to one conclusion. A QAOA-sized QUBO can produce a *good* schedule, but it can't produce a *proven optimal* one, and it can't scale to a whole day. The MILP is exact and fast, but it starts from nothing. So we combined them (`../quantum_warm_start_milp.py`, explained in `../QUANTUM_WARM_START.md`):
+Steps 1–4 point to one conclusion. A QAOA-sized QUBO can produce a *good* schedule, but it can't produce a *proven optimal* one, and it can't scale to a whole day. The MILP is exact and fast, but it starts from nothing. So we combined them (`../scheduling/quantum_warm_start_milp.py`, explained in `../docs/QUANTUM_WARM_START.md`):
 
 1. A small block QUBO (QAOA when ≤ 20 qubits, annealing above that) proposes on/off schedules.
 2. Classical `repair` makes them legal, and the cheapest one becomes a full MILP solution vector.
@@ -155,6 +180,8 @@ $PY explanation/run_experiments.py blocks   # -> results/blocks.json   (~25 min,
 $PY explanation/run_experiments.py pure     # -> results/pure.json     (~20 min, log in results/pure.log)
 #   (or: $PY explanation/run_experiments.py all)
 
+$PY explanation/diagnose_pure_qaoa.py       # -> results/diagnose.json (~2 min, printout in results/diagnose.log)
+
 $PY explanation/make_figures.py             # -> figures/*.png (reads only results/*.json, a few seconds)
 ```
 
@@ -169,6 +196,7 @@ $PY explanation/make_figures.py             # -> figures/*.png (reads only resul
 | `05_warm_start_timeline.png` | `warm.json` | `exp_warm` → `highs_with_timeline` | `quantum_warm_start_milp.bigger_fleet`, `Milp`, `split_into_blocks`, `Qubo`, `solve_qaoa`, `solve_anneal`, `repair`, `true_cost`, `full_solution` |
 | `06_warm_start_metrics.png` | `warm.json` | `exp_warm` | same as 05 |
 | `07_summary.png` | `pure.json`, `blocks.json`, `warm.json` | — | — |
+| `08_why_pure_qaoa_breaks_rules.png` | `diagnose.json` | `diagnose_pure_qaoa.py` → `run_loop` (A, B, C), `schedule_day` (D) | `run_qaoa_schedule.QAOA`, `build_qubo`, `add_locks`; `check.locks`, `hour_ok`, `check_schedule` |
 
 Settings worth knowing when reading the numbers:
 

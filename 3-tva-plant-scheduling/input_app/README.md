@@ -99,7 +99,7 @@ repair turns the best candidate into a feasible full-day MILP starting
 solution, and HiGHS solves the MILP. It uses the saved editor CSVs and does not
 submit QPU jobs. The webapp caps the local QUBO at 16 bits for responsiveness;
 this selector reports the final schedule, not a cold-versus-warm speedup test.
-See `../QUANTUM_WARM_START.md` for the benchmark script and its limits.
+See `../docs/QUANTUM_WARM_START.md` for the benchmark script and its limits.
 
 The source examples in `data/` stay unchanged. To use the edited files in a
 notebook or Python script run from this project folder:

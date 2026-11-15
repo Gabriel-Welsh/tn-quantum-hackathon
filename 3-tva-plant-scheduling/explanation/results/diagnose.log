@@ -1,0 +1,46 @@
+
+===== 5 plants (8 qubits/hour), MILP $327,924
+  A: gap  +10.14%  broken  5  {'min up/down': 5}  startups 8
+  B: gap  +28.03%  broken  3  {'min up/down': 2, 'reserve not met': 1}  startups 10
+  C: gap   +7.06%  broken  0  {}  startups 6
+  D: gap   +7.06%  broken  0  {}  startups 6
+
+===== 6 plants (9 qubits/hour), MILP $375,604
+  A: gap  +26.26%  broken 10  {'min up/down': 10}  startups 14
+  B: gap  +15.61%  broken  1  {'min up/down': 1}  startups 10
+  C: gap  +12.90%  broken  2  {'min up/down': 2}  startups 8
+  D: gap   +5.36%  broken  0  {}  startups 6
+     C breaks: ['11', 'PEAKER_A', 'min down broken', 'restarted after 1 h off (needs 3)']
+     C breaks: ['13', 'COAL_MID', 'min down broken', 'restarted after 4 h off (needs 8)']
+     C schedule around the breaks (hour, need MW, plants on):
+        5     428  COAL+COAL_MID
+        6     494  COAL+COAL_MID
+        7     564  COAL+PEAKER_A+OIL+COAL_MID
+        8     621  COAL+PEAKER_A+PEAKER_B+OIL+COAL_MID
+        9     679  COAL+GAS_CC+PEAKER_A+PEAKER_B
+       10     723  COAL+GAS_CC+PEAKER_B
+       11     817  COAL+GAS_CC+PEAKER_A+PEAKER_B+OIL
+       12     846  COAL+GAS_CC+PEAKER_A+PEAKER_B+OIL
+       13     877  COAL+GAS_CC+PEAKER_A+COAL_MID
+       14     902  COAL+GAS_CC+PEAKER_A+OIL+COAL_MID
+
+===== 10 plants (13 qubits/hour), MILP $602,139
+  A: gap  +30.05%  broken 13  {'min up/down': 13}  startups 32
+  B: gap  +33.14%  broken  4  {'min up/down': 3, 'reserve not met': 1}  startups 26
+  C: gap  +24.60%  broken  2  {'min up/down': 2}  startups 23
+  D: gap   +7.99%  broken  0  {}  startups 14
+     C breaks: ['9', 'COAL_MID', 'min down broken', 'restarted after 2 h off (needs 8)']
+     C breaks: ['11', 'COAL', 'min down broken', 'restarted after 3 h off (needs 48)']
+     C schedule around the breaks (hour, need MW, plants on):
+        3     546  COAL+OIL+COAL_MID
+        4     579  COAL+COAL_MID+COAL_SMALL
+        5     642  COAL+OIL+COAL_MID+COAL_SMALL+OIL_2
+        6     741  COAL+PEAKER_A+COAL_MID+COAL_SMALL+PEAKER_C+OIL_2
+        7     846  COAL+GAS_CC+PEAKER_A+PEAKER_B+COAL_SMALL+PEAKER_C+OIL_2
+        8     932  GAS_CC+PEAKER_A+PEAKER_B+OIL+COAL_SMALL+GAS_CC_2+PEAKER_C
+        9    1019  GAS_CC+PEAKER_A+PEAKER_B+COAL_MID+COAL_SMALL+GAS_CC_2+PEAKER_C
+       10    1085  GAS_CC+PEAKER_A+OIL+COAL_MID+COAL_SMALL+GAS_CC_2+PEAKER_C+OIL_2
+       11    1225  COAL+GAS_CC+COAL_MID+COAL_SMALL+GAS_CC_2
+       12    1269  COAL+GAS_CC+OIL+COAL_MID+COAL_SMALL+GAS_CC_2+OIL_2
+
+saved results/diagnose.json

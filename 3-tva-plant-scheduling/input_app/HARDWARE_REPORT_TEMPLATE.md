@@ -1,6 +1,6 @@
 # Hardware report data template
 
-The **Quantum hardware report** tab in `index.html` graphs the archived local HiGHS-only medians from `../QUANTUM_WARM_START.md`; these are not complete hybrid runtimes or physical-QPU results. The report no longer displays empty end-to-end or QPU graph templates. `hardware_report.R` can generate standalone SVG charts from the CSVs below. Run the script from `input_app/`:
+The **Quantum hardware report** tab in `index.html` graphs the archived local HiGHS-only medians from `../docs/QUANTUM_WARM_START.md`; these are not complete hybrid runtimes or physical-QPU results. The report no longer displays empty end-to-end or QPU graph templates. `hardware_report.R` can generate standalone SVG charts from the CSVs below. Run the script from `input_app/`:
 
 ```bash
 Rscript hardware_report.R

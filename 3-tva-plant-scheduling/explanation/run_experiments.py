@@ -11,7 +11,7 @@ data/plants.csv + data/demand.csv exactly (MILP optimum $327,924), N = 10 is the
 
 Usage (run from the 3-tva-plant-scheduling folder with the qBraid-SDK environment's Python):
   PY=~/.qbraid/environments/qbraid_r7ts/pyenv/bin/python
-  $PY explanation/run_experiments.py pure     # 1. pure QAOA vs QAOA + rule checking, hour by hour
+  $PY explanation/run_experiments.py pure     # 1. hour-by-hour QAOA (starter formulation) vs + rule checking
   $PY explanation/run_experiments.py blocks   # 2. hours grouped into K blocks + the full 24-hour QUBO
   $PY explanation/run_experiments.py qubits   # 3. qubit counts of every formulation (no solving)
   $PY explanation/run_experiments.py warm     # 4. HiGHS cold vs quantum warm start
@@ -29,9 +29,9 @@ import numpy as np
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
-sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(ROOT / "scheduling"))
 
-from check import check_schedule, load_demand, load_plants, solve_milp  # noqa: E402
+from check import check_schedule, hour_cost, hour_ok, load_demand, load_plants, locks, solve_milp  # noqa: E402
 import run_qaoa_schedule as RQ  # noqa: E402
 import block_qubo as BQ  # noqa: E402
 import run_all_24h_qaoa_schedule as R24  # noqa: E402
@@ -53,8 +53,22 @@ def fleet(n):
     return sub, d, np.round(0.1 * d)
 
 
+SLACK_BITS = 3   # the starter's and run_qaoa_schedule.py's default: spare capacity 0..7 blocks of 50 MW
+
+
 def n_slack_bits(plants, demand, reserve, block_mw=50):
-    """Slack bits needed so the capacity penalty can be exactly zero in every hour."""
+    """Slack qubits for the one-hour QUBO: always the starter's 3.
+
+    The first version of this study used n_slack_bits_full (below), which adds slack bits until the
+    capacity penalty can be exactly zero even with every plant on (5 bits at 10 plants, so 15 qubits).
+    That was a mistake: every extra qubit doubles the search space QAOA has to cover with the same
+    200 shots, and it also removes the penalty's push against switching on far more capacity than needed.
+    With 3 bits, choices with more than 7 spare blocks pay a small penalty, which is the intended bias."""
+    return SLACK_BITS
+
+
+def n_slack_bits_full(plants, demand, reserve, block_mw=50):
+    """(Old, kept for the before/after comparison.) Slack bits so the penalty can be zero in every hour."""
     total = sum(p["pmax_mw"] for p in plants) / block_mw
     spare = max(total - math.ceil((d + r) / block_mw) for d, r in zip(demand, reserve))
     return max(1, int(math.floor(spare)).bit_length())
@@ -68,7 +82,8 @@ def save(name, obj):
 
 # ------------------------------------------------------------------ 1. pure QAOA vs rule checking
 def pure_qaoa_day(plants, demand, reserve, seed, n_slack, shots=SHOTS, p=1, maxiter=60):
-    """Hour-by-hour QAOA with NO classical rule checking: each hour, build the one-hour QUBO
+    """(Earlier, incorrect "pure QAOA" of figure 01 - kept for reference, used by the diagnosis scripts.)
+    Hour-by-hour QAOA with NO classical rule checking: each hour, build the one-hour QUBO
     (costs + capacity penalty, the starter's formulation), tune QAOA, sample `shots` times and keep the
     sample with the lowest QUBO energy. No min up/down locks, no feasibility check, no repair."""
     n = len(plants)
@@ -90,6 +105,42 @@ def pure_qaoa_day(plants, demand, reserve, seed, n_slack, shots=SHOTS, p=1, maxi
     return np.array(sched)
 
 
+def starter_qaoa_day(plants, demand, reserve, seed, n_slack, shots=SHOTS, p=1, maxiter=60):
+    """Hour-by-hour QAOA exactly as starter.ipynb's schedule_day does it (the project's QAOA formulation):
+      QUBO   = plant costs + capacity penalty (3 slack qubits) + min up/down LOCK penalties from check.locks,
+               so the one-hour QUBO knows which plants earlier hours force on or off;
+      QAOA   p=1, angles warm-started from the previous hour, `shots` samples;
+      pick   the cheapest sampled on/off choice that is VALID this hour (hour_ok with the locks),
+             by exact hour_cost. If no sample is valid: one that only breaks a lock; else the most common.
+    No look-ahead, no local search, no repair (those are what "rule checking" adds)."""
+    n = len(plants)
+    nq = n + n_slack
+    qa = RQ.QAOA(nq)
+    plant_index = qa.bits[:, :n] @ (2 ** np.arange(n))
+    rng = np.random.default_rng(seed)
+    was_on = [int(x["on_at_start"]) for x in plants]
+    history, angles = [], None
+    for t in range(len(demand)):
+        must_on, must_off = locks(plants, history)
+        c = RQ.plant_hour_costs(plants, was_on)
+        Q, off = RQ.build_qubo(c, plants, demand[t], reserve[t], 50, n_slack, 2.0 * c.max())
+        Q, off = RQ.add_locks(Q, off, must_on, must_off, weight=2 * c.max())
+        angles, probs, _ = qa.run(Q, off, p=p, start=angles, maxiter=maxiter)
+        samples = rng.choice(len(probs), size=shots, p=probs / probs.sum())
+        seen = [[int((k >> i) & 1) for i in range(n)] for k in np.unique(plant_index[samples])]
+        ok = [ch for ch in seen if hour_ok(plants, demand[t], reserve[t], ch, must_on, must_off)]
+        if not ok:
+            ok = [ch for ch in seen if hour_ok(plants, demand[t], reserve[t], ch)]
+        if ok:
+            pick = min(ok, key=lambda ch: hour_cost(plants, demand[t], ch, was_on))
+        else:
+            k = int(np.bincount(plant_index[samples]).argmax())
+            pick = [int((k >> i) & 1) for i in range(n)]
+        history.append(pick)
+        was_on = pick
+    return np.array(history)
+
+
 def exp_pure():
     rows = []
     for n in SIZES:
@@ -97,10 +148,10 @@ def exp_pure():
         milp_cost, *_ = solve_milp(plants, d, r)
         ns = n_slack_bits(plants, d, r)
         for seed in SEEDS:
-            for method in ("pure", "rules"):
+            for method in ("qaoa", "rules"):
                 t0 = time.perf_counter()
-                if method == "pure":
-                    s = pure_qaoa_day(plants, d, r, seed, ns)
+                if method == "qaoa":      # the starter's QAOA formulation (figure 01)
+                    s = starter_qaoa_day(plants, d, r, seed, ns)
                 else:   # the project's loop: locks + feasibility look-ahead + valid pick + local-search repair
                     s, _ = RQ.schedule_day(plants, d, r, p=1, shots=SHOTS, sampler="qaoa", seed=seed,
                                            use_credit=False, use_local_search=True, n_slack=ns,
