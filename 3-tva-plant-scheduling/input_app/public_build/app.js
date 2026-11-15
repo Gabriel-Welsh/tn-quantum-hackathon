@@ -375,7 +375,7 @@ function drawDemandChart(values) {
   addSvg(root, "path", { d: path(required), class: "required-line" });
 }
 
-/* Two honest browser heuristics. The stable rule keeps plants on or off for
+/* Browser scheduling rules. The stable rule keeps plants on or off for
  * their minimum run times after a switch during this day; unknown pre-day
  * run time is not guessed. Cheapest-first deliberately ignores those limits. */
 function plantScore(plant, demand, wasOn, stable) {
@@ -411,6 +411,129 @@ function generateCommitments(mode) {
     result.push(on); previous = on;
   });
   return result;
+}
+
+/* A one-layer QAOA statevector, simulated locally. Each qubit represents one
+ * plant's on/off decision for one hour. The phase separator uses a simplified
+ * hourly cost with penalties for capacity, minimum output, and run-time locks.
+ * This is a teaching-sized model, distinct from the project's hardware run. */
+const QAOA_MAX_PLANTS = 10;
+const QAOA_SHOTS = 512;
+function qaoaState(phases, gamma, beta) {
+  const count = phases.length;
+  const real = new Float64Array(count), imag = new Float64Array(count);
+  const initial = 1 / Math.sqrt(count);
+  for (let mask = 0; mask < count; mask++) {
+    real[mask] = initial * Math.cos(gamma * phases[mask]);
+    imag[mask] = -initial * Math.sin(gamma * phases[mask]);
+  }
+  const cosine = Math.cos(beta), sine = Math.sin(beta);
+  for (let bit = 1; bit < count; bit *= 2) {
+    for (let mask = 0; mask < count; mask++) {
+      if (mask & bit) continue;
+      const other = mask | bit;
+      const ar = real[mask], ai = imag[mask], br = real[other], bi = imag[other];
+      real[mask] = cosine * ar + sine * bi;
+      imag[mask] = cosine * ai - sine * br;
+      real[other] = cosine * br + sine * ai;
+      imag[other] = cosine * bi - sine * ar;
+    }
+  }
+  return { real, imag };
+}
+function qaoaHour(plants, demand, required, previous, switchedAt, hour) {
+  const count = 1 << plants.length;
+  const energies = new Float64Array(count);
+  const feasible = new Uint8Array(count);
+  let bestCost = Infinity, worstCost = 0;
+  for (let mask = 0; mask < count; mask++) {
+    let capacity = 0, minimum = 0, cost = 0, lockBreaks = 0;
+    for (let i = 0; i < plants.length; i++) {
+      const on = Boolean(mask & (1 << i));
+      const plant = plants[i];
+      if (on) {
+        capacity += plant.pmax_mw;
+        minimum += plant.pmin_mw;
+        cost += plant.no_load_cost_per_h + plant.pmin_mw * plant.marginal_cost_per_mwh;
+        if (!previous[i]) cost += plant.startup_cost;
+      }
+      if (on !== previous[i] && switchedAt[i] >= 0 &&
+          hour - switchedAt[i] < (previous[i] ? plant.min_up_h : plant.min_down_h)) lockBreaks++;
+    }
+    // Include the dispatch energy above minimum output in the phase cost.
+    if (minimum <= demand && capacity >= demand) {
+      let remaining = demand - minimum;
+      const order = plants.map((_, i) => i).filter((i) => mask & (1 << i))
+        .sort((a, b) => plants[a].marginal_cost_per_mwh - plants[b].marginal_cost_per_mwh);
+      for (const i of order) {
+        const extra = Math.min(remaining, plants[i].pmax_mw - plants[i].pmin_mw);
+        cost += extra * plants[i].marginal_cost_per_mwh;
+        remaining -= extra;
+      }
+    }
+    const shortfall = Math.max(0, required - capacity);
+    const excessMinimum = Math.max(0, minimum - demand);
+    feasible[mask] = Number(shortfall === 0 && excessMinimum === 0 && lockBreaks === 0);
+    energies[mask] = cost + 100_000 * (shortfall + excessMinimum + lockBreaks);
+    if (feasible[mask]) { bestCost = Math.min(bestCost, cost); worstCost = Math.max(worstCost, cost); }
+  }
+  if (!Number.isFinite(bestCost)) {
+    bestCost = Math.min(...energies);
+    worstCost = Math.max(...energies);
+  }
+  // Keep phase angles useful across fleets whose costs have different scales.
+  const scale = Math.max(1, worstCost - bestCost);
+  const phases = Float64Array.from(energies, (energy) => Math.min(4, (energy - bestCost) / scale));
+  let bestExpectation = Infinity, bestReal = null, bestImag = null;
+  for (const gamma of [0.5, 1, 2, 4, 6]) {
+    for (const beta of [0.3, 0.6, 0.9, 1.2]) {
+      const { real, imag } = qaoaState(phases, gamma, beta);
+      let expectation = 0;
+      for (let mask = 0; mask < count; mask++)
+        expectation += (real[mask] ** 2 + imag[mask] ** 2) * phases[mask];
+      if (expectation < bestExpectation) {
+        bestExpectation = expectation; bestReal = real; bestImag = imag;
+      }
+    }
+  }
+  // Simulate finite measurement shots and keep the cheapest feasible sample.
+  // If no sample passes the checks, return the lowest-penalty sampled state;
+  // the existing rule checker will show any resulting problems.
+  const cumulative = new Float64Array(count);
+  let total = 0;
+  for (let mask = 0; mask < count; mask++) {
+    total += bestReal[mask] ** 2 + bestImag[mask] ** 2;
+    cumulative[mask] = total;
+  }
+  let chosen = -1;
+  for (let shot = 0; shot < QAOA_SHOTS; shot++) {
+    const target = Math.random() * total;
+    let low = 0, high = count - 1;
+    while (low < high) {
+      const middle = (low + high) >> 1;
+      if (target < cumulative[middle]) high = middle;
+      else low = middle + 1;
+    }
+    const mask = low;
+    if (chosen < 0 || (feasible[mask] && !feasible[chosen]) ||
+        (feasible[mask] === feasible[chosen] && energies[mask] < energies[chosen])) chosen = mask;
+  }
+  return plants.map((_, i) => Boolean(chosen & (1 << i)));
+}
+function generateQaoaCommitments() {
+  const plants = state.plants;
+  if (plants.length > QAOA_MAX_PLANTS) {
+    throw new Error(`Browser QAOA supports up to ${QAOA_MAX_PLANTS} plants. Choose another rule for larger fleets.`);
+  }
+  let previous = plants.map((plant) => Boolean(plant.on_at_start));
+  const switchedAt = plants.map(() => -1);
+  return state.demand.map((demand, hour) => {
+    const required = demand + Math.round(demand * state.reservePercent / 100);
+    const on = qaoaHour(plants, demand, required, previous, switchedAt, hour);
+    on.forEach((value, i) => { if (value !== previous[i]) switchedAt[i] = hour; });
+    previous = on;
+    return on;
+  });
 }
 
 function evaluateCommitments(schedule) {
@@ -519,13 +642,17 @@ function showSchedule(report) {
 const DESCRIPTIONS = {
   stable: "Keeps plants on or off for their minimum run times after a change during the day, then fills demand by a cost ranking.",
   cheap: "Ranks plants by (marginal cost + no-load cost) divided by maximum MW, separately for every hour. It may break operating rules.",
+  qaoa: "Classically simulates a one-layer QAOA circuit and 512 measurement shots per hour (up to 10 plants). Results can vary between runs. This is not the QAOA run we did on an actual quantum computer.",
 };
 $("#algorithm").addEventListener("change", () => {
   $("#algorithm-description").textContent = DESCRIPTIONS[$("#algorithm").value];
   invalidateSchedule();
 });
 $("#run-schedule").addEventListener("click", () => {
-  try { showSchedule(evaluateCommitments(generateCommitments($("#algorithm").value))); }
+  try {
+    const mode = $("#algorithm").value;
+    showSchedule(evaluateCommitments(mode === "qaoa" ? generateQaoaCommitments() : generateCommitments(mode)));
+  }
   catch (error) { $("#schedule-status").textContent = `Could not generate a schedule: ${error.message}`; }
 });
 

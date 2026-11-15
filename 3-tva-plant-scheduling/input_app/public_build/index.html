@@ -52,7 +52,7 @@
         <article class="step"><span class="step-number">02</span><h2>Shape demand</h2><p>Adjust hourly demand and the reserve percentage.</p><a href="#demand">Open demand <span aria-hidden="true">→</span></a></article>
         <article class="step"><span class="step-number">03</span><h2>Compare choices</h2><p>Generate a schedule and inspect its capacity and rule checks.</p><a href="#schedule">Open schedule <span aria-hidden="true">→</span></a></article>
       </div>
-      <aside class="note" aria-label="About this public copy"><strong>Runs entirely in your browser.</strong> Your edits stay on this device. This public demo uses two transparent classical rules; the research MILP and QAOA solvers require the original Python app.</aside>
+      <aside class="note" aria-label="About this public copy"><strong>Runs entirely in your browser.</strong> Your edits stay on this device. The scheduler includes two classical rules and a small, classically simulated QAOA example. The QAOA run we did on an actual quantum computer is separate from this public demo.</aside>
     </section>
 
     <section id="plants" class="page" aria-labelledby="plants-title" hidden>
@@ -88,8 +88,8 @@
     </section>
 
     <section id="schedule" class="page" aria-labelledby="schedule-title" hidden>
-      <div class="page-heading"><p class="eyebrow">Step 3 · Dispatch</p><h1 id="schedule-title">Plant schedule</h1><p>See available online capacity beside demand plus reserve for each hour. The browser rules are quick teaching examples; they do not solve the research optimization model.</p></div>
-      <div class="panel schedule-controls"><div><label for="algorithm">Scheduling rule</label><select id="algorithm"><option value="stable">Stable heuristic · considers minimum run times</option><option value="cheap">Cheapest-first · picks each hour independently</option></select><p id="algorithm-description" class="help"></p></div><button id="run-schedule" class="button primary" type="button">Generate schedule</button></div>
+      <div class="page-heading"><p class="eyebrow">Step 3 · Dispatch</p><h1 id="schedule-title">Plant schedule</h1><p>See available online capacity beside demand plus reserve for each hour. These browser examples use simplified hourly decisions and do not solve the research optimization model.</p></div>
+      <div class="panel schedule-controls"><div><label for="algorithm">Scheduling rule</label><select id="algorithm" aria-describedby="algorithm-description"><option value="stable">Stable heuristic · considers minimum run times</option><option value="cheap">Cheapest-first · picks each hour independently</option><option value="qaoa">QAOA · simulated in browser (up to 10 plants)</option></select><p id="algorithm-description" class="help"></p></div><button id="run-schedule" class="button primary" type="button">Generate schedule</button></div>
       <p id="schedule-status" class="status" role="status" aria-live="polite"></p>
       <div id="schedule-results" hidden>
         <div id="schedule-metrics" class="metric-grid" aria-label="Schedule summary"></div>
@@ -97,7 +97,7 @@
         <figure class="panel chart-panel"><div class="chart-heading"><h2>Online capacity by hour</h2><span class="legend"><i class="block capacity-key"></i>Online capacity <i class="line required-key"></i>Required capacity</span></div><svg id="schedule-chart" viewBox="0 0 760 310" role="img" aria-labelledby="schedule-chart-title schedule-chart-desc"><title id="schedule-chart-title">Online capacity compared with required capacity</title><desc id="schedule-chart-desc">Use the table below for exact hourly values and plant names.</desc></svg><figcaption>Bars show maximum available output of online plants, not actual energy dispatched.</figcaption></figure>
         <details class="panel data-details"><summary>Inspect all 24 hours</summary><div class="table-scroll"><table><caption>Generated plant commitments by hour</caption><thead><tr><th scope="col">Hour</th><th scope="col">Demand</th><th scope="col">Reserve</th><th scope="col">Plants on</th><th scope="col">Online MW</th><th scope="col">Check</th></tr></thead><tbody id="schedule-rows"></tbody></table></div></details>
       </div>
-      <aside class="note"><strong>About the calculation.</strong> The stable rule tries to honor minimum on and off times. The cheapest-first rule reproduces the simple hourly ranking from the notebook. Both use a simplified cost estimate and omit ramp constraints. A green capacity result is not a certificate of full feasibility.</aside>
+      <aside class="note"><strong>About the calculation.</strong> The stable rule tries to honor minimum on and off times. The cheapest-first rule reproduces the simple hourly ranking from the notebook. Browser QAOA simulates one circuit layer and 512 measurement shots for each hour, then chooses the lowest-cost sampled schedule that passes the visible checks. It uses a simpler cost model than the Python QAOA solver and omits its slack bits, look-ahead, and local search. Results can vary between runs. It is not the run we did on an actual quantum computer. All three use simplified costs and omit ramp constraints. A green capacity result is not a certificate of full feasibility.</aside>
     </section>
 
     <section id="report" class="page" aria-labelledby="report-title" hidden>
