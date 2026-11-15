@@ -24,7 +24,7 @@ from pathlib import Path
 import numpy as np
 
 HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE.parent))
+sys.path.insert(0, str(HERE.parent / "scheduling"))
 sys.path.insert(0, str(HERE))
 
 from check import check_schedule, locks, solve_milp  # noqa: E402

@@ -113,7 +113,7 @@ def chart_widget(png, name):
     hybrid_chart_<name>.png. Returns (widget, path)."""
     import base64
     import ipywidgets as W
-    path = os.path.join(HERE, f"hybrid_chart_{name}.png")
+    path = os.path.join(HERE, "outputs", f"hybrid_chart_{name}.png")
     with open(path, "wb") as f:
         f.write(png)
     src = "data:image/png;base64," + base64.b64encode(png).decode("ascii")
@@ -518,7 +518,7 @@ def show():
         buf.write("hour," + ",".join(names) + "\n")
         for t, row in enumerate(main["schedule"]):
             buf.write(f"{t}," + ",".join(str(int(x)) for x in row) + "\n")
-        path = os.path.join(HERE, "hybrid_schedule.csv")
+        path = os.path.join(HERE, "outputs", "hybrid_schedule.csv")
         with open(path, "w") as f:
             f.write(buf.getvalue())
         parts.append(W.HTML(SECTION.format("Saved files")

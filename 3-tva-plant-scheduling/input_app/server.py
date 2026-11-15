@@ -22,7 +22,7 @@ PLANTS_CSV = FOLDER / "plants.csv"
 PORT = 8000
 
 # The existing checker lives beside input_app and provides schedule validation.
-sys.path.insert(0, str(FOLDER.parent))
+sys.path.insert(0, str(FOLDER.parent / "scheduling"))
 from algorithms import available
 
 # Add validation here when you add new numeric plant fields to plants.csv.

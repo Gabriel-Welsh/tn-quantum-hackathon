@@ -29,7 +29,7 @@ import numpy as np
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
-sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(ROOT / "scheduling"))
 
 from check import check_schedule, hour_cost, hour_ok, load_demand, load_plants, locks, solve_milp  # noqa: E402
 import run_qaoa_schedule as RQ  # noqa: E402

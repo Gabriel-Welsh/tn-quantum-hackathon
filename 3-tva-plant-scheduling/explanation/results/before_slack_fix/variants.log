@@ -7,8 +7,8 @@
   locks in QUBO, 200 shots           qubits  9  gap  +22.50%  broken   2.0  capacity/min-output bad hours  1.3  best sample = QUBO min 68% of hours
   locks in QUBO, 2000 shots          qubits  9  gap   +7.06%  broken   0.0  capacity/min-output bad hours  0.0  best sample = QUBO min 100% of hours
   locks in QUBO, p=3, 2000 shots     qubits  9  gap   +7.06%  broken   0.0  capacity/min-output bad hours  0.0  best sample = QUBO min 100% of hours
-  exact QUBO min, no locks           qubits  9  gap   +6.07%  broken   3.0  capacity/min-output bad hours  0.0  
-  exact QUBO min + locks             qubits  9  gap   +7.06%  broken   0.0  capacity/min-output bad hours  0.0  
+  exact QUBO min, no locks           qubits  9  gap   +6.07%  broken   3.0  capacity/min-output bad hours  0.0
+  exact QUBO min + locks             qubits  9  gap   +7.06%  broken   0.0  capacity/min-output bad hours  0.0
   landscape (fig 01 run): bitstrings within 1% of min energy, median 46; best vs 2nd-best on/off choice, median 0.0002 of the range; <E> QAOA 0.072 vs uniform 0.220; P(QUBO min) 0.01086 vs uniform 0.00195
 
 ===== 10 plants (slack bits 5; starter uses 3)
