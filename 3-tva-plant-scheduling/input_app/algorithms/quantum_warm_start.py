@@ -6,7 +6,6 @@ schedule, and never submits a QPU job. The full MILP still checks and optimizes
 the schedule; this option is not evidence of a runtime speedup by itself.
 """
 
-from importlib.util import find_spec
 
 NAME = "Quantum warm-start MILP"
 DESCRIPTION = (
@@ -18,20 +17,22 @@ DESCRIPTION = (
 
 def solve(plants, demand, reserve):
     """Return a full-day commitment matrix from HiGHS with a QAOA warm start."""
-    if find_spec("highspy") is None:
-        raise RuntimeError(
-            "Quantum warm-start MILP needs highspy. Run the app with a qBraid-SDK "
-            "Python environment that has highspy installed."
-        )
     if len(plants) > 16:
         raise ValueError("Local warm-start QAOA supports at most 16 plants (one block each).")
 
-    # Import lazily so the other webapp algorithms do not require highspy.
+    # Import lazily so the other webapp algorithms do not require highspy. Importing the module
+    # installs highspy into the server's Python environment if it is missing (ensure_highspy).
     import numpy as np
-    from quantum_warm_start_milp import (
-        Milp, Qubo, full_solution, repair, run_highs, solve_qaoa,
-        split_into_blocks, true_cost,
-    )
+    try:
+        from quantum_warm_start_milp import (
+            Milp, Qubo, full_solution, repair, run_highs, solve_qaoa,
+            split_into_blocks, true_cost,
+        )
+    except ImportError as err:
+        raise RuntimeError(
+            f"Quantum warm-start MILP needs highspy. {err} "
+            "Or start the app with the qBraid-SDK environment's Python."
+        ) from err
 
     model = Milp(plants, demand, reserve)
     # Keep the local simulator responsive: at most 16 QUBO bits, and at most

@@ -44,11 +44,45 @@ import numpy as np
 from scipy.optimize import minimize
 from scipy.sparse import csc_matrix, csr_matrix
 
+HIGHSPY_REQUIREMENT = "highspy>=1.16"     # the HiGHS MILP solver's Python API (tested with 1.16.0)
+
+
+def ensure_highspy():
+    """Import highspy, installing it first into the running Python environment if it is missing.
+
+    qBraid's qBraid-SDK environment doesn't ship highspy, so a fresh kernel or Lab instance needs it once.
+    The install goes into the same environment as this Python (`sys.executable -m pip`), so the notebook
+    kernel, the command line and the web app each get it where they run. If the install fails (no network,
+    or an externally managed system Python), raises ImportError with the command to run by hand.
+    Set QWS_NO_AUTO_INSTALL=1 to turn the automatic install off.
+    """
+    import importlib
+    try:
+        return importlib.import_module("highspy")
+    except ImportError:
+        pass
+    how = f'{sys.executable} -m pip install "{HIGHSPY_REQUIREMENT}"'
+    if os.environ.get("QWS_NO_AUTO_INSTALL") != "1":
+        import subprocess
+        print(f"highspy (the HiGHS MILP solver) is not installed in this environment; installing it:\n  {how}",
+              file=sys.stderr, flush=True)
+        done = subprocess.run([sys.executable, "-m", "pip", "install", "--quiet", HIGHSPY_REQUIREMENT])
+        if done.returncode == 0:
+            importlib.invalidate_caches()
+            try:
+                return importlib.import_module("highspy")
+            except ImportError:
+                pass
+    raise ImportError("This code needs highspy (the HiGHS Python API), and it could not be installed "
+                      f"automatically. Install it into this environment, then restart the kernel:\n  {how}")
+
+
 try:
-    import highspy
-except ImportError:
-    sys.exit("This script needs highspy (the HiGHS Python API). Install it into the kernel's environment:\n"
-             "  python -m pip install highspy")
+    highspy = ensure_highspy()
+except ImportError as _err:
+    if __name__ == "__main__":
+        sys.exit(str(_err))
+    raise
 
 HERE = Path(__file__).resolve().parent.parent
 

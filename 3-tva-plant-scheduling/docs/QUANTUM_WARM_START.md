@@ -234,11 +234,11 @@ Each mode runs `--repeats` times with different seeds (solver timing is noisy). 
 
 ## 4. How to run it
 
-Use the qBraid-SDK environment's Python (the same one as the **qBraid-SDK (v0.12.2)** notebook kernel). HiGHS's Python package must be installed once:
+Use the qBraid-SDK environment's Python (the same one as the **qBraid-SDK (v0.12.2)** notebook kernel). HiGHS's Python package, `highspy`, isn't part of that environment. The script installs it automatically the first time it runs (`ensure_highspy()` in the script; set `QWS_NO_AUTO_INSTALL=1` to turn that off). To install it by hand instead:
 
 ```bash
 PY=/home/jovyan/.qbraid/environments/qbraid_r7ts/pyenv/bin/python
-$PY -m pip install highspy          # once
+$PY -m pip install "highspy>=1.16"   # optional: the script does this itself if needed
 cd /home/jovyan/tn-quantum-hackathon/3-tva-plant-scheduling
 
 $PY scheduling/quantum_warm_start_milp.py --selftest                 # check everything first
@@ -249,7 +249,7 @@ $PY scheduling/quantum_warm_start_milp.py --copies 6 --solver anneal # 30 plants
 $PY scheduling/quantum_warm_start_milp.py --copies 6 --solver anneal --out outputs/results_c6.json
 ```
 
-From a notebook with that kernel: `!python -m pip install highspy`, then `%run ../scheduling/quantum_warm_start_milp.py --selftest` (and so on).
+From a notebook with that kernel: `%run ../scheduling/quantum_warm_start_milp.py --selftest` (and so on).
 
 Qiskit and qiskit-aer are optional. Without them, QAOA samples from the numpy simulation, and the circuit check in `--selftest` is skipped.
 

@@ -8,11 +8,12 @@
    python server.py
    ```
 
-   The **Quantum warm-start MILP** option also needs `highspy`. On this Lab
-   instance it is installed in the qBraid-SDK environment, so start the app
-   with that environment's Python to use this option. Find its path with
-   `qbraid envs list`, then run `<env-path>/pyenv/bin/python server.py`.
-   Other app algorithms continue to work without `highspy`.
+   The **Quantum warm-start MILP** option also needs `highspy` and the
+   qBraid-SDK environment's packages (numpy, scipy, qiskit), so start the app
+   with that environment's Python: find its path with `qbraid envs list`, then
+   run `<env-path>/pyenv/bin/python server.py`. If `highspy` is missing, the
+   first warm-start run installs it into that environment automatically.
+   Other app algorithms work without `highspy`.
 
 2. In another Lab terminal, open it in Agent Canvas:
 
